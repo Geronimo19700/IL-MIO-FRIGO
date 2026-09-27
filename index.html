@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scadenze Alimentari</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f2f2f7;
+    color: #222;
+}
+
+header {
+    background: #2e7d32;
+    color: white;
+    padding: 22px 15px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 25px;
+}
+
+.container {
+    padding: 18px;
+    max-width: 600px;
+    margin: auto;
+}
+
+.card {
+    background: white;
+    padding: 18px;
+    border-radius: 15px;
+    margin-bottom: 18px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 13px;
+    margin: 7px 0 12px;
+    border: 1px solid #ccc;
+    border-radius: 9px;
+    font-size: 16px;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #2e7d32;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+}
+
+.prodotto {
+    background: white;
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 13px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.prodotto strong {
+    font-size: 18px;
+}
+
+.scadenza {
+    margin-top: 7px;
+    color: #555;
+}
+
+.scaduto {
+    border-left: 6px solid #d32f2f;
+}
+
+.urgente {
+    border-left: 6px solid #f57c00;
+}
+
+.normale {
+    border-left: 6px solid #2e7d32;
+}
+
+.elimina {
+    background: #d32f2f;
+    margin-top: 10px;
+    padding: 9px;
+    font-size: 14px;
+}
+
+.vuoto {
+    text-align: center;
+    color: #777;
+    padding: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <h1>🛒 Scadenze Alimentari</h1>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>➕ Aggiungi prodotto</h2>
+
+        <label>Nome prodotto</label>
+        <input id="nome" type="text" placeholder="Es. Latte">
+
+        <label>Data di scadenza</label>
+        <input id="data" type="date">
+
+        <button onclick="aggiungiProdotto()">
+            Aggiungi prodotto
+        </button>
+    </div>
+
+    <div class="card">
+        <h2>📋 I miei prodotti</h2>
+        <div id="lista"></div>
+    </div>
+
+</div>
+
+<script>
+
+let prodotti = JSON.parse(localStorage.getItem("prodotti")) || [];
+
+function salva() {
+    localStorage.setItem("prodotti", JSON.stringify(prodotti));
+}
+
+function aggiungiProdotto() {
+
+    const nome = document.getElementById("nome").value.trim();
+    const data = document.getElementById("data").value;
+
+    if (!nome || !data) {
+        alert("Inserisci il nome del prodotto e la data di scadenza.");
+        return;
+    }
+
+    prodotti.push({
+        id: Date.now(),
+        nome: nome,
+        data: data
+    });
+
+    salva();
+
+    document.getElementById("nome").value = "";
+    document.getElementById("data").value = "";
+
+    mostraProdotti();
+    controllaNotifiche();
+}
+
+function eliminaProdotto(id) {
+
+    prodotti = prodotti.filter(p => p.id !== id);
+
+    salva();
+    mostraProdotti();
+}
+
+function giorniAllaScadenza(data) {
+
+    const oggi = new Date();
+    oggi.setHours(0,0,0,0);
+
+    const scadenza = new Date(data + "T00:00:00");
+
+    const differenza = scadenza - oggi;
+
+    return Math.ceil(differenza / (1000 * 60 * 60 * 24));
+}
+
+function mostraProdotti() {
+
+    const lista = document.getElementById("lista");
+
+    if (prodotti.length === 0) {
+        lista.innerHTML =
+            '<div class="vuoto">Non hai ancora inserito prodotti.</div>';
+        return;
+    }
+
+    prodotti.sort((a,b) => a.data.localeCompare(b.data));
+
+    lista.innerHTML = "";
+
+    prodotti.forEach(prodotto => {
+
+        const giorni = giorniAllaScadenza(prodotto.data);
+
+        let classe = "normale";
+        let testo = "";
+
+        if (giorni < 0) {
+            classe = "scaduto";
+            testo = "⚠️ Scaduto";
+        }
+        else if (giorni === 0) {
+            classe = "scaduto";
+            testo = "🔴 Scade oggi";
+        }
+        else if (giorni === 1) {
+            classe = "urgente";
+            testo = "🟠 Scade domani";
+        }
+        else {
+            testo = "🟢 Mancano " + giorni + " giorni";
+        }
+
+        const dataFormattata =
+            prodotto.data.split("-").reverse().join("/");
+
+        lista.innerHTML += `
+            <div class="prodotto ${classe}">
+                <strong>${escapeHtml(prodotto.nome)}</strong>
+
+                <div class="scadenza">
+                    Scadenza: ${dataFormattata}
+                </div>
+
+                <div class="scadenza">
+                    ${testo}
+                </div>
+
+                <button class="elimina"
+                    onclick="eliminaProdotto(${prodotto.id})">
+                    🗑️ Elimina
+                </button>
+            </div>
+        `;
+    });
+}
+
+function escapeHtml(testo) {
+
+    const div = document.createElement("div");
+    div.textContent = testo;
+    return div.innerHTML;
+}
+
+function controllaNotifiche() {
+
+    if (!("Notification" in window)) {
+        return;
+    }
+
+    if (Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+
+    if (Notification.permission !== "granted") {
+        return;
+    }
+
+    prodotti.forEach(prodotto => {
+
+        const giorni = giorniAllaScadenza(prodotto.data);
+
+        if (giorni === 1) {
+
+            const chiave =
+                "notifica_" + prodotto.id + "_" +
+                new Date().toISOString().slice(0,10);
+
+            if (!localStorage.getItem(chiave)) {
+
+                new Notification("Scadenza domani", {
+                    body: prodotto.nome +
+                          " scade domani!"
+                });
+
+                localStorage.setItem(chiave, "1");
+            }
+        }
+    });
+}
+
+mostraProdotti();
+
+</script>
+
+</body>
+</html>
