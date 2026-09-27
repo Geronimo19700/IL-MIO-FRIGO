@@ -326,6 +326,21 @@ if ("serviceWorker" in navigator) {
 </script>
 <script>
 const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby7bZKZFca6q0hBj6gBY0H7P1DB12Pm68-jkzCdjb32UN7DsGjq5E-GpV4HKSTlUnLz/exec";
+    async function sincronizzaScadenze() {
+  const prodotti = JSON.parse(localStorage.getItem("prodotti") || "[]");
+
+  try {
+    await fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(prodotti)
+    });
+  } catch (errore) {
+    console.log("Sincronizzazione non riuscita:", errore);
+  }
+}
 </script>
 </body>
 </html>
