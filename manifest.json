@@ -1,0 +1,10 @@
+{
+  "name": "Scadenze Alimentari",
+  "short_name": "Scadenze",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f5f5f5",
+  "theme_color": "#2e7d32",
+  "description": "Gestione delle scadenze dei prodotti alimentari",
+  "icons": []
+}
