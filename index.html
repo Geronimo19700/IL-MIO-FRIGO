@@ -105,8 +105,21 @@ button {
     color: #777;
     padding: 20px;
 }
-</style>
+</style><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "93dc8f8e-0941-4fa3-836f-c3ea747843f8",
+      safari_web_id: "web.onesignal.auto.245258f0-6c6a-439f-986f-895149dbff04",
+      notifyButton: {
+        enable: true,
+      },
+    });
+  });
+</script>
 </head>
+
 
 <body>
 
