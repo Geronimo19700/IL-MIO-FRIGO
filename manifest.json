@@ -1,19 +1,10 @@
 {
-
   "name": "Il mio frigo",
-
   "short_name": "Il mio frigo",
-
   "start_url": "./",
-
   "display": "standalone",
-
   "background_color": "#f5f5f5",
-
   "theme_color": "#2e7d32",
-
   "description": "Lista della spesa e scadenze alimentari",
-
   "icons": []
-
 }
