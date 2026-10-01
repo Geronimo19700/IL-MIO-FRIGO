@@ -329,7 +329,10 @@ button:active { transform: scale(.99); }
 .hidden { display: none !important; }
 </style>
 
-<script>window.VERSIONE_PROVA_LOCALE=true;</script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>window.VERSIONE_PROVA_LOCALE=false;</script>
+
+
 <script>
 window.OneSignalDeferred = window.OneSignalDeferred || [];
 if (!window.VERSIONE_PROVA_LOCALE) OneSignalDeferred.push(async function(OneSignal) {
@@ -405,18 +408,123 @@ body.fridge-mode .container{max-width:850px!important}
 .food-menu{position:absolute;right:12px;top:80px;z-index:5;min-width:180px;background:white;border:1px solid #d9e5ef;border-radius:14px;box-shadow:0 8px 20px #7993a744;padding:6px}.food-menu button{display:block;width:100%;text-align:left;font-size:13px;background:#e9f3fc;color:#23558a;margin:3px 0;padding:10px}.food-menu button.delete-food{background:#ffeded;color:#a82626}.fridge-empty{text-align:center;background:white;border-radius:24px;padding:30px;color:#65798f}
 @media(max-width:420px){.fridge-product{grid-template-columns:60px minmax(0,1fr) 83px 28px;gap:7px;padding:11px 8px;border-radius:20px}.food-illustration{width:60px;height:67px;font-size:41px}.food-name{font-size:17px}.food-category{font-size:11px;padding:5px 7px}.days-badge{font-size:13px}.food-expiry strong{font-size:12px}.fridge-add-toggle{padding:16px 11px!important;font-size:14px!important}.fridge-search{padding:0 10px}.fridge-search input{font-size:14px!important}}
 @media(max-width:355px){.fridge-product{grid-template-columns:48px minmax(0,1fr) 75px 25px;gap:5px}.food-illustration{width:48px;height:60px;font-size:34px}.food-name{font-size:15px}.food-expiry strong{font-size:11px}.food-actions{width:25px}}
-</style></head>
+</style><style id="icone-categorie-uniformi">
+.spesa-category-icon{flex:0 0 49px;width:49px;height:49px;border-radius:15px;background:#eef8f0;display:flex;align-items:center;justify-content:center;font-size:31px;line-height:1}
+.spesa-item{display:flex;align-items:center;gap:10px}
+.spesa-name{min-width:0;flex:1}
+@media(max-width:420px){.spesa-category-icon{width:42px;height:42px;flex-basis:42px;font-size:27px}.spesa-item{gap:7px}}
+</style><style>
+/* Titoli aggiornati: grafica frigo e nome lista */
+#headerFrigo .hero-title{white-space:normal!important;gap:13px!important;text-align:left!important;letter-spacing:-.5px!important}
+.expiry-title-icon{display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;flex:0 0 58px;background:#d8edff;border:2px solid #acd7f4;border-radius:19px;font-size:35px;box-shadow:0 5px 13px rgba(51,122,180,.12)}
+.mobile-title-break{display:none}
+.lista-name-wrap{display:flex;align-items:center;gap:12px;min-height:75px;padding:12px 16px;border:2px solid #ccebd7;border-radius:23px;background:linear-gradient(125deg,#f2fff6,#eaf8ef);box-shadow:0 5px 14px rgba(37,133,82,.07)}
+.list-name-icon{display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;background:#d9f3e2;border-radius:15px;font-size:25px}
+.lista-name-wrap .lista-nome{font-size:clamp(21px,3.5vw,29px)!important;font-family:ui-rounded,"Trebuchet MS","Segoe UI",sans-serif!important;letter-spacing:-.5px!important;line-height:1.16!important;overflow-wrap:anywhere}
+#paginaSpesa .spesa-head{align-items:center!important}
+@media(max-width:480px){#headerFrigo .hero-title{font-size:clamp(23px,6.2vw,31px)!important}.expiry-title-icon{width:49px;height:49px;flex-basis:49px;font-size:29px}.mobile-title-break{display:block}.lista-name-wrap{padding:10px;gap:8px;min-height:66px}.list-name-icon{width:37px;height:37px;flex-basis:37px;font-size:22px}.lista-name-wrap .lista-nome{font-size:21px!important}}
+</style><style id="correzione-nome-lista">
+#paginaSpesa .spesa-head>div:first-child{flex:1 1 auto;min-width:0}
+#paginaSpesa .lista-name-wrap{width:100%;box-sizing:border-box;min-width:0;display:flex!important;align-items:center!important;gap:12px!important;background:linear-gradient(125deg,#eaffef,#f5fff7)!important;border:2px solid #a8d9b7!important;padding:13px!important;border-radius:22px!important}
+#paginaSpesa .list-name-content{min-width:0;flex:1;display:flex;flex-direction:column;gap:5px}
+#paginaSpesa .list-name-caption{font-size:11px;letter-spacing:1.4px;font-weight:900;color:#6c9d78}
+#paginaSpesa #nomeLista{display:block!important;visibility:visible!important;opacity:1!important;position:static!important;height:auto!important;min-height:28px!important;overflow-wrap:anywhere!important;color:#176e3a!important;font-size:clamp(20px,3.3vw,29px)!important;font-weight:900!important;line-height:1.18!important;text-align:left!important}
+#paginaSpesa .rename-button{flex:0 0 48px!important;width:48px!important;height:48px!important;border-radius:16px!important;font-size:24px!important}
+@media(max-width:420px){#paginaSpesa .lista-name-wrap{padding:10px!important;gap:8px!important}#paginaSpesa #nomeLista{font-size:19px!important}}
+</style><style id="archivio-liste-styles">
+#headerSpesa{display:none!important}
+#paginaSpesa .lista-name-wrap{min-height:76px!important}
+#paginaSpesa .list-name-content{justify-content:center}
+.archive-backdrop{display:none;position:fixed;inset:0;z-index:100;background:#1d314d91;padding:14px;align-items:center;justify-content:center}
+.archive-backdrop.open{display:flex}
+.archive-panel{width:min(100%,600px);max-height:90dvh;overflow:auto;background:#fff;border-radius:26px;padding:23px;box-shadow:0 20px 60px #102a3b44;color:#243d43}
+.archive-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.archive-heading h2{font-size:23px;margin:0 0 15px;color:#187545}.archive-close{background:#f0f4f6!important;color:#345!important;width:40px!important;height:40px!important;border-radius:50%!important;padding:0!important}
+.archive-panel label{display:block;font-weight:800;margin:10px 0 7px}.archive-rename{display:flex;gap:8px}.archive-rename input{flex:1;min-width:0;border:2px solid #d3e7d9;border-radius:13px;padding:12px;font-size:16px}.archive-rename button{width:auto!important;background:#33894f!important;border-radius:13px!important;padding:10px 13px!important;white-space:nowrap}
+.archive-panel h3{margin:26px 0 5px;color:#276f4a}.archive-help{font-size:13px;line-height:1.45;color:#617578;margin:0 0 13px}.archive-list{display:grid;gap:9px;max-height:240px;overflow:auto}.archive-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f3faf5;border:1px solid #d5eadb;border-radius:14px;padding:10px}.archive-info{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}.archive-info small{color:#718078}.archive-item button{width:auto!important;white-space:nowrap;padding:10px!important;background:#6e34a7!important;border-radius:12px!important}.archive-item button:disabled{background:#b5c7bc!important}
+.archive-footer{display:grid;gap:9px;margin-top:20px}.archive-footer button{width:100%!important;border-radius:14px!important;padding:14px!important}.archive-new{background:#27874b!important}.archive-delete{background:#fff0f0!important;color:#ac3d3d!important;border:1px solid #f3c9c9!important}.archive-delete:disabled{opacity:.45}
+@media(max-width:420px){.archive-panel{padding:15px}.archive-rename{flex-direction:column}.archive-rename button{width:100%!important}}
+</style><style>
+/* Archivio prodotti: icona di categoria e separazione per ogni voce */
+.library-list{display:flex;flex-direction:column;gap:9px;padding:4px 2px 12px}
+.library-item{display:flex;align-items:center;gap:10px;padding:11px 10px!important;border:1.5px solid #5b626b!important;border-radius:14px;background:#fff;box-shadow:0 2px 5px rgba(0,0,0,.045);min-width:0}
+.library-category-icon{display:flex;flex:0 0 43px;width:43px;height:43px;align-items:center;justify-content:center;background:#eff8f0;border-radius:12px;font-size:27px;line-height:1}
+.library-name{min-width:0;overflow-wrap:anywhere}
+.library-days{white-space:nowrap}
+.library-item button{flex-shrink:0}
+@media(max-width:420px){.library-item{gap:6px;padding:9px 7px!important}.library-category-icon{flex-basis:35px;width:35px;height:35px;font-size:23px}.library-name{font-size:13px}.library-days{font-size:12px}.library-item button{padding:7px!important}}
+</style>
+<style id="contorni-prodotti-spesa-frigo">
+/* Schede separate per ogni prodotto, mantenendo la grafica esistente. */
+#listaSpesa .spesa-item {
+  border: 1.5px solid #aeb9b4 !important;
+  border-radius: 18px !important;
+  background: #fff !important;
+  box-shadow: 0 3px 9px rgba(32, 75, 51, .08) !important;
+  margin: 0 0 12px !important;
+  padding: 12px !important;
+}
+#listaSpesa .spesa-item:last-child { margin-bottom: 0 !important; }
+#lista.fridge-products .fridge-product {
+  border: 1.5px solid #9ebbd4 !important;
+  border-radius: 22px !important;
+  box-shadow: 0 4px 12px rgba(47, 92, 139, .10) !important;
+}
+@media(max-width:420px) {
+  #listaSpesa .spesa-item { padding: 10px 7px !important; }
+}
+</style>
+
+<style id="bordo-riquadro-lista-spesa">
+/* Contorno delicato attorno al gruppo nome lista, ricerca e prodotti salvati. */
+#paginaSpesa > .card:first-child {
+  border: 2px solid #a5cdb4 !important;
+  border-radius: 29px !important;
+  box-shadow: 0 5px 16px rgba(37,103,62,.11) !important;
+  background: #fff !important;
+}
+</style>
+<style id="istruzioni-prodotti-salvati">
+.istruzione-plus{display:inline-flex;align-items:center;justify-content:center;width:29px;height:29px;border-radius:7px;background:#268742;color:#fff;font-weight:900;font-size:23px;vertical-align:middle;margin:0 4px;line-height:1}
+</style><style id="pulsanti-diretti-frigo">
+/* Pulsanti sempre visibili su PC e iPhone, senza menu a tre puntini. */
+.fridge-product{grid-template-columns:74px minmax(0,1fr) 91px 43px!important}
+.fridge-direct-actions{display:flex;flex-direction:column;gap:9px;align-items:center;justify-content:center;min-width:0}
+.fridge-direct-actions button{display:flex!important;align-items:center;justify-content:center;flex:0 0 auto;width:39px!important;height:39px!important;min-width:39px;border:1.5px solid transparent!important;border-radius:12px!important;padding:0!important;margin:0!important;box-shadow:none!important;line-height:1!important;cursor:pointer}
+.fridge-edit-btn{background:#e7f2ff!important;color:#246caa!important;font-size:20px!important}
+.fridge-remove-btn{background:#e34b51!important;color:#fff!important;font-size:32px!important;font-weight:800!important}
+.fridge-direct-actions button:focus-visible{outline:3px solid #2563eb;outline-offset:2px}
+@media(max-width:420px){.fridge-product{grid-template-columns:55px minmax(0,1fr) 77px 35px!important;gap:6px!important;padding:10px 7px!important}.food-illustration{width:55px!important;height:62px!important;font-size:37px!important}.fridge-direct-actions button{width:33px!important;height:33px!important;min-width:33px!important}.fridge-remove-btn{font-size:27px!important}.fridge-edit-btn{font-size:18px!important}.food-name{font-size:16px!important}.food-expiry strong{font-size:11px!important}}
+@media(max-width:355px){.fridge-product{grid-template-columns:43px minmax(0,1fr) 67px 31px!important;gap:4px!important}.food-illustration{width:43px!important;height:53px!important;font-size:30px!important}.fridge-direct-actions button{width:30px!important;height:30px!important;min-width:30px!important}}
+</style>
+<style id="gestione-quantita">
+.quantity-control{display:inline-flex;align-items:center;justify-content:center;gap:4px;border:1px solid #cbd7d1;background:#f8fbf9;border-radius:14px;padding:3px;white-space:nowrap}
+.quantity-control button{width:30px!important;height:30px!important;min-width:30px!important;padding:0!important;margin:0!important;border-radius:10px!important;background:#e6f4eb!important;color:#246d3d!important;font-size:21px!important;font-weight:900!important;line-height:1!important}
+.quantity-control button:disabled{opacity:.32!important}
+.quantity-control span{min-width:25px;text-align:center;font-weight:900;font-size:16px;color:#243b31}
+.shopping-qty{flex:0 0 auto}
+.fridge-qty{justify-self:center}
+#lista.fridge-products .fridge-product{grid-template-columns:74px minmax(0,1fr) 91px auto auto!important}
+@media(max-width:560px){
+ #listaSpesa .spesa-item{flex-wrap:wrap}
+ #listaSpesa .spesa-name{flex:1 1 calc(100% - 60px)}
+ #listaSpesa .shopping-qty{margin-left:56px}
+ #lista.fridge-products .fridge-product{grid-template-columns:60px minmax(0,1fr) 83px!important}
+ .fridge-qty{grid-column:2;justify-self:start;margin-top:2px}
+ .fridge-direct-actions{grid-column:3;grid-row:2;justify-self:end}
+}
+</style>
+<style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style></head>
 
 <body>
 
 <nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button></nav>
 
 <header id="headerSpesa" class="header-spesa">
-  <h1 class="hero-title"><span class="accent-lines">⌁</span><span class="hero-cart">🛒</span> Lista spesa <span class="accent-lines">⌁</span></h1>
+  
 </header>
 
 <header id="headerFrigo" class="header-frigo hidden">
-  <h1 class="hero-title">🧊 I miei prodotti</h1>
+  <h1 class="hero-title"><span class="expiry-title-icon" aria-hidden="true">🗓️</span><span>I miei prodotti<br class="mobile-title-break"> in scadenza</span></h1>
 </header>
 
 <main class="container">
@@ -426,10 +534,10 @@ body.fridge-mode .container{max-width:850px!important}
   <div class="card">
     <div class="spesa-head">
       <div>
-        <div class="lista-nome" id="nomeLista"></div>
-        <div class="small-note">La lista prende automaticamente il nome dalla data.</div>
+        <div class="lista-name-wrap"><span class="list-name-icon" aria-hidden="true">📝</span><div class="list-name-content"><div class="lista-nome" id="nomeLista">LISTA SPESA — 01/10/2026</div></div></div>
+        
       </div>
-      <button class="secondary rename-button" onclick="rinominaLista()" aria-label="Rinomina lista">📝</button>
+      <button class="secondary rename-button" onclick="apriGestioneListe()" aria-label="Modifica nome e richiama liste salvate" title="Modifica o richiama una lista">✏️</button>
     </div>
 
     <div class="add-row">
@@ -472,11 +580,7 @@ body.fridge-mode .container{max-width:850px!important}
     <div id="modalDestinazione" class="small-note"></div>
 
     <div id="editBox" class="edit-mode">
-      🔒 I prodotti non sono modificabili in questa modalità.
-      <div class="small-note">
-        Per evitare modifiche accidentali, attiva esplicitamente la modalità modifica.
-      </div>
-      <button class="secondary" style="margin-top:10px;width:100%" onclick="attivaModifica()">🔓 Abilita modifica</button>
+      <button class="secondary" style="margin-top:0;width:100%" onclick="attivaModifica()">🔓 Abilita modifica</button>
     </div>
 
     <div id="editActions" class="edit-actions">
@@ -488,6 +592,17 @@ body.fridge-mode .container{max-width:850px!important}
   </div>
 </div>
 
+<div id="gestioneListe" class="archive-backdrop" role="dialog" aria-modal="true" aria-labelledby="titoloGestioneListe" onclick="if(event.target===this)chiudiGestioneListe()">
+ <div class="archive-panel">
+  <div class="archive-heading"><h2 id="titoloGestioneListe">📝 Gestisci le tue liste</h2><button type="button" class="archive-close" onclick="chiudiGestioneListe()" aria-label="Chiudi">✕</button></div>
+  <label for="nomeListaModifica">Nome della lista attuale</label>
+  <div class="archive-rename"><input id="nomeListaModifica" type="text" maxlength="90" placeholder="Nome della lista"><button type="button" onclick="salvaNomeDaGestione()">Salva nome</button></div>
+  <h3>📚 Richiama una vecchia lista</h3>
+  <p class="archive-help">Le liste vengono conservate su questo dispositivo. Se ne richiami una, puoi modificarla e poi tornare a crearne una nuova.</p>
+  <div id="archivioListeElenco" class="archive-list"></div>
+  <div class="archive-footer"><button type="button" class="archive-new" onclick="creaNuovaListaDaGestione()">＋ Crea una nuova lista</button><button type="button" class="archive-delete" id="eliminaListaRichiamata" onclick="eliminaListaAttualeDaGestione()">🗑 Elimina la lista richiamata</button></div>
+ </div>
+</div>
 <script>
 /*
   IMPORTANTE:
@@ -500,6 +615,8 @@ const CHIAVE_PRODOTTI_VECCHI = "prodotti";
 const CHIAVE_LISTA_SPESA = "listaSpesa";
 const CHIAVE_PRODOTTI_SALVATI = "prodottiSalvati";
 const CHIAVE_NOME_LISTA = "nomeListaSpesa";
+const CHIAVE_ARCHIVIO_LISTE = "archivioListeSpesa_v1";
+const CHIAVE_ID_LISTA = "idListaSpesaAttiva_v1";
 
 const prodottiInizialiSalvati = [
   {nome:"AFFETTATO", giorni:7},
@@ -525,6 +642,9 @@ let prodotti = JSON.parse(localStorage.getItem(CHIAVE_PRODOTTI_VECCHI) || "[]");
 let listaSpesa = JSON.parse(localStorage.getItem(CHIAVE_LISTA_SPESA) || "[]");
 let prodottiSalvati = JSON.parse(localStorage.getItem(CHIAVE_PRODOTTI_SALVATI) || "null");
 let nomeLista = localStorage.getItem(CHIAVE_NOME_LISTA) || "";
+if (/^LISTA SPESA\s*[—-]\s*\d/i.test(nomeLista)) { nomeLista=nomeLista.replace(/^LISTA SPESA\s*[—-]\s*/i, "");localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista); }
+let archivioListe = JSON.parse(localStorage.getItem(CHIAVE_ARCHIVIO_LISTE) || "[]");
+let idListaAttiva = localStorage.getItem(CHIAVE_ID_LISTA) || "";
 let destinazioneLista = "spesa";
 let modificaAbilitata = false;
 
@@ -543,6 +663,7 @@ function salvaProdotti() {
 
 function salvaListaSpesa() {
   localStorage.setItem(CHIAVE_LISTA_SPESA, JSON.stringify(listaSpesa));
+  archiviaListaAttiva();
 }
 
 function salvaProdottiSalvati() {
@@ -560,7 +681,7 @@ function oggiISO() {
 
 function nomeAutomaticoData() {
   const d = new Date();
-  return "LISTA SPESA — " + d.toLocaleDateString("it-IT", {
+  return d.toLocaleDateString("it-IT", {
     day:"2-digit", month:"long", year:"numeric"
   }).toUpperCase();
 }
@@ -570,16 +691,74 @@ function aggiornaNomeLista() {
     nomeLista = nomeAutomaticoData();
     localStorage.setItem(CHIAVE_NOME_LISTA, nomeLista);
   }
-  document.getElementById("nomeLista").textContent = nomeLista;
+  document.getElementById("nomeLista").textContent = nomeLista || nomeAutomaticoData();
+  archiviaListaAttiva();
 }
 
-function rinominaLista() {
-  const nuovo = prompt("Nome della lista:", nomeLista || nomeAutomaticoData());
-  if (nuovo && nuovo.trim()) {
-    nomeLista = nuovo.trim();
-    localStorage.setItem(CHIAVE_NOME_LISTA, nomeLista);
-    aggiornaNomeLista();
-  }
+function generaIdLista() { return "lista_" + Date.now() + "_" + Math.random().toString(36).slice(2,8); }
+function archiviaListaAttiva() {
+  if (!nomeLista) return;
+  if (!idListaAttiva) { idListaAttiva = generaIdLista(); localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva); }
+  const indice = archivioListe.findIndex(l => l.id === idListaAttiva);
+  const precedente = indice >= 0 ? archivioListe[indice] : null;
+  const record = {id:idListaAttiva,nome:nomeLista,prodotti:JSON.parse(JSON.stringify(listaSpesa)),creata:precedente?.creata || new Date().toISOString(),aggiornata:new Date().toISOString()};
+  if (indice >= 0) archivioListe[indice] = record; else archivioListe.push(record);
+  localStorage.setItem(CHIAVE_ARCHIVIO_LISTE,JSON.stringify(archivioListe));
+}
+function apriGestioneListe() {
+  archiviaListaAttiva();
+  document.getElementById("nomeListaModifica").value=nomeLista;
+  document.getElementById("gestioneListe").classList.add("open");
+  renderArchivioListe();
+}
+function chiudiGestioneListe() { document.getElementById("gestioneListe").classList.remove("open"); }
+function rinominaLista() { apriGestioneListe(); }
+function salvaNomeDaGestione() {
+  const nuovo=document.getElementById("nomeListaModifica").value.trim();
+  if(!nuovo){alert("Inserisci il nome della lista.");return;}
+  nomeLista=nuovo;
+  localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
+  aggiornaNomeLista();renderArchivioListe();
+}
+function renderArchivioListe() {
+  const box=document.getElementById("archivioListeElenco");
+  box.replaceChildren();
+  const liste=[...archivioListe].sort((a,b)=>b.aggiornata.localeCompare(a.aggiornata));
+  if(!liste.length){box.textContent="Non ci sono ancora liste salvate.";return;}
+  liste.forEach(l=>{
+    const r=document.createElement("div");r.className="archive-item";
+    const info=document.createElement("div");info.className="archive-info";
+    const name=document.createElement("strong");name.textContent=l.nome;
+    const detail=document.createElement("small");detail.textContent=(l.prodotti?.length||0)+" prodotti"+(l.id===idListaAttiva?" · Lista aperta":"");
+    info.append(name,detail);
+    const btn=document.createElement("button");btn.type="button";btn.textContent=l.id===idListaAttiva?"Aperta":"Richiama";btn.disabled=l.id===idListaAttiva;btn.onclick=()=>richiamaLista(l.id);
+    r.append(info,btn);box.append(r);
+  });
+  document.getElementById("eliminaListaRichiamata").disabled=!idListaAttiva;
+}
+function richiamaLista(id) {
+  const trovata=archivioListe.find(l=>l.id===id);if(!trovata)return;
+  archiviaListaAttiva();
+  idListaAttiva=trovata.id;nomeLista=trovata.nome;
+  listaSpesa=JSON.parse(JSON.stringify(trovata.prodotti||[]));
+  localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
+  localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
+  salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
+}
+function creaNuovaListaDaGestione() {
+  archiviaListaAttiva();
+  idListaAttiva=generaIdLista();nomeLista=nomeAutomaticoData();listaSpesa=[];
+  localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
+  localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
+  salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
+}
+function eliminaListaAttualeDaGestione() {
+  if(!confirm('Chiudere questa lista, rimetterla nell’archivio e crearne una nuova? La lista e tutti i suoi prodotti resteranno salvati e potrai richiamarli quando vuoi.'))return;
+  archiviaListaAttiva();
+  idListaAttiva=generaIdLista();nomeLista=nomeAutomaticoData();listaSpesa=[];
+  localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
+  localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
+  salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
 }
 
 function mostraPagina(pagina) {
@@ -610,7 +789,8 @@ function aggiungiAllaSpesa() {
   listaSpesa.push({
     id: Date.now() + Math.random(),
     nome: nome,
-    acquistato: false
+    acquistato: false,
+    quantita: 1
   });
 
   input.value = "";
@@ -630,12 +810,22 @@ function aggiungiProdottoSalvatoAllaSpesa(id) {
   listaSpesa.push({
     id: Date.now() + Math.random(),
     nome: p.nome,
-    acquistato: false
+    acquistato: false,
+    quantita: 1
   });
 
   salvaListaSpesa();
   mostraListaSpesa();
   chiudiListaSalvati();
+}
+
+function cambiaQuantitaSpesa(id, delta) {
+  const p = listaSpesa.find(x => String(x.id) === String(id));
+  if (!p) return;
+  const attuale = Number.isInteger(Number(p.quantita)) ? Number(p.quantita) : 1;
+  p.quantita = Math.max(1, Math.min(10, attuale + delta));
+  salvaListaSpesa();
+  mostraListaSpesa();
 }
 
 function cambiaStatoAcquisto(id) {
@@ -648,11 +838,11 @@ function cambiaStatoAcquisto(id) {
 }
 
 function eliminaDallaSpesa(id) {
+  if (listaSpesa.length === 1) archiviaListaAttiva();
   listaSpesa = listaSpesa.filter(x => x.id !== id);
+  if (listaSpesa.length === 0) preparaNuovaLista();
   salvaListaSpesa();
   mostraListaSpesa();
-
-  if (listaSpesa.length === 0) preparaNuovaLista();
 }
 
 function mostraListaSpesa() {
@@ -672,9 +862,15 @@ function mostraListaSpesa() {
   listaSpesa.forEach(p => {
     box.innerHTML += `
       <div class="spesa-item">
+        <div class="spesa-category-icon" aria-label="${infoAlimento(p.nome).categoria}" title="${infoAlimento(p.nome).categoria}">${infoAlimento(p.nome).emoji}</div>
         <div class="spesa-name ${p.acquistato ? "purchased" : ""}">
           <strong>${escapeHtml(p.nome)}</strong>
           ${p.acquistato ? '<div class="small-note">✓ Già acquistato</div>' : ""}
+        </div>
+        <div class="quantity-control shopping-qty" aria-label="Quantità">
+          <button onclick="cambiaQuantitaSpesa(${p.id},-1)" ${((p.quantita||1)<=1)?'disabled':''}>−</button>
+          <span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span>
+          <button onclick="cambiaQuantitaSpesa(${p.id},1)" ${((p.quantita||1)>=10)?'disabled':''}>＋</button>
         </div>
         <button class="item-btn item-buy" onclick="cambiaStatoAcquisto(${p.id})">
           ${p.acquistato ? "↩" : "✓"}
@@ -691,6 +887,8 @@ function mostraListaSpesa() {
 }
 
 function preparaNuovaLista() {
+  idListaAttiva = generaIdLista();
+  localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
   nomeLista = "";
   localStorage.removeItem(CHIAVE_NOME_LISTA);
   aggiornaNomeLista();
@@ -702,26 +900,27 @@ async function trasferisciTuttoInFrigo() {
   const pronti = [];
   for (const item of daTrasferire) {
     const salvato = trovaProdottoSalvato(item.nome);
-    if (salvato) { pronti.push({nome:item.nome, giorni:salvato.giorni}); continue; }
+    if (salvato) { pronti.push({nome:item.nome, giorni:salvato.giorni, quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))}); continue; }
     const vuoleSalvare = confirm('Vuoi aggiungere "' + item.nome + '" alla LISTA PRODOTTI SALVATI?');
     const risposta = prompt('Quanti giorni di scadenza vuoi assegnare a "' + item.nome + '"?');
     if (risposta === null) return;
     const giorni = Number(risposta);
     if (!Number.isInteger(giorni) || giorni < 0) { alert('Inserisci un numero di giorni valido.'); return; }
-    pronti.push({nome:item.nome, giorni, vuoleSalvare});
+    pronti.push({nome:item.nome, giorni, vuoleSalvare, quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))});
   }
   pronti.forEach(item => {
-    aggiungiAlFrigoConGiorni(item.nome,item.giorni);
+    aggiungiAlFrigoConGiorni(item.nome,item.giorni,item.quantita);
     if (item.vuoleSalvare) aggiungiProdottoSalvato(item.nome,item.giorni);
   });
-  listaSpesa = []; salvaListaSpesa(); preparaNuovaLista(); mostraListaSpesa(); mostraPagina('frigo');
+  archiviaListaAttiva();
+  listaSpesa = []; preparaNuovaLista(); salvaListaSpesa(); mostraListaSpesa(); mostraPagina('frigo');
 }
 function trovaProdottoSalvato(nome) {
   const normalizza = s => s.trim().toLocaleUpperCase("it-IT");
   return prodottiSalvati.find(p => normalizza(p.nome) === normalizza(nome));
 }
 
-function aggiungiAlFrigoConGiorni(nome, giorni) {
+function aggiungiAlFrigoConGiorni(nome, giorni, quantita = 1) {
   const data = new Date();
   data.setHours(0,0,0,0);
   data.setDate(data.getDate() + giorni);
@@ -733,7 +932,8 @@ function aggiungiAlFrigoConGiorni(nome, giorni) {
   prodotti.push({
     id: Date.now() + Math.random(),
     nome: nome,
-    data: iso
+    data: iso,
+    quantita: Math.max(1,Math.min(10,Number(quantita)||1))
   });
 
   salvaProdotti();
@@ -764,7 +964,8 @@ function aggiungiProdottoManuale() {
   prodotti.push({
     id: Date.now(),
     nome: nome,
-    data: data
+    data: data,
+    quantita: 1
   });
 
   salvaProdotti();
@@ -819,14 +1020,29 @@ function filtraFrigo(categoria){
   document.querySelectorAll('.category-chip').forEach(x=>x.classList.toggle('selected',x.dataset.cat===categoria));
   mostraProdotti();
 }
+
+/* Immagini degli alimenti incorporate nel file HTML: disponibili anche offline. */
+const ICONE_PRODOTTI = {"latte": ["🥛", "#d8efff"], "uova": ["🥚🥚🥚", "#fff2d9"], "affettato": ["🥓", "#ffe5dc"], "prosciutto": ["🥓", "#ffe5dc"], "salame": ["🍖", "#ffe5dc"], "caffe": ["☕", "#e8d9ca"], "capsule": ["☕", "#e8d9ca"], "confettura": ["🍓", "#ffe3ed"], "marmellata": ["🍓", "#ffe3ed"], "yogurt": ["🥣", "#eaf0ff"], "mozzarella": ["🧀", "#fff4d9"], "formaggio": ["🧀", "#fff4d9"], "pane": ["🍞", "#ffeed8"], "cereali": ["🥣", "#f7e9d5"], "insalata": ["🥬", "#e4f6dd"], "pomodor": ["🍅", "#ffe3de"], "frutta": ["🍎", "#ffebd9"], "mela": ["🍎", "#ffebd9"], "pasta": ["🍝", "#fff0d9"], "wurstel": ["🌭", "#ffe7da"], "würstel": ["🌭", "#ffe7da"], "passata": ["🍅", "#ffe3de"], "ketchup": ["🍅", "#ffe3de"], "maionese": ["🥫", "#fff4d9"], "senape": ["🌭", "#fff0c7"], "pollo": ["🍗", "#ffebd8"], "pesce": ["🐟", "#e3f2ff"], "burro": ["🧈", "#fff4da"], "ricotta": ["🧀", "#fff4d9"], "banana": ["🍌", "#fff5d5"], "carota": ["🥕", "#ffe9d9"], "zucchin": ["🥒", "#e8f5df"], "acqua": ["💧", "#e3f4ff"]};
+const DISEGNI_PRODOTTI = {"latte": "<path d=\"M32 15h31l8 13v59H26V28z\" fill=\"#f6fcff\" stroke=\"#5393c7\" stroke-width=\"3\"/><path d=\"M32 15l-6 13h45l-8-13\" fill=\"#a6d7f3\" stroke=\"#5393c7\" stroke-width=\"2\"/><rect x=\"30\" y=\"40\" width=\"37\" height=\"30\" rx=\"4\" fill=\"#5ca5dc\"/><path d=\"M40 54q9-12 17 0q-8 14-17 0\" fill=\"white\"/><path d=\"M52 15v13\" stroke=\"#5393c7\" stroke-width=\"2\"/>", "uova": "<path d=\"M14 59q32-16 68 0l-8 21H22z\" fill=\"#b79a73\" stroke=\"#80664a\" stroke-width=\"2\"/><ellipse cx=\"30\" cy=\"49\" rx=\"14\" ry=\"21\" fill=\"#f8dfb8\" stroke=\"#d1aa74\" stroke-width=\"2\"/><ellipse cx=\"51\" cy=\"45\" rx=\"14\" ry=\"23\" fill=\"#fff0d7\" stroke=\"#d1aa74\" stroke-width=\"2\"/><ellipse cx=\"71\" cy=\"49\" rx=\"13\" ry=\"21\" fill=\"#edcc9c\" stroke=\"#c6a070\" stroke-width=\"2\"/><path d=\"M17 65h63\" stroke=\"#8d7657\" stroke-width=\"3\"/>", "confettura": "<rect x=\"25\" y=\"25\" width=\"47\" height=\"57\" rx=\"9\" fill=\"#e95676\" stroke=\"#aa2d4b\" stroke-width=\"3\"/><rect x=\"22\" y=\"17\" width=\"53\" height=\"13\" rx=\"4\" fill=\"#d8e1e6\" stroke=\"#8197a3\" stroke-width=\"2\"/><rect x=\"31\" y=\"44\" width=\"35\" height=\"25\" rx=\"5\" fill=\"#fff8e9\"/><path d=\"M49 48c-14-7-17 12 0 17c17-5 14-24 0-17z\" fill=\"#d83850\"/><path d=\"M47 47l5-5\" stroke=\"#35864e\" stroke-width=\"3\"/>", "capsule": "<ellipse cx=\"48\" cy=\"27\" rx=\"24\" ry=\"8\" fill=\"#cba27a\" stroke=\"#77513b\" stroke-width=\"3\"/><path d=\"M24 27l8 45q16 13 32 0l8-45\" fill=\"#764c36\" stroke=\"#563a2c\" stroke-width=\"3\"/><ellipse cx=\"48\" cy=\"27\" rx=\"24\" ry=\"8\" fill=\"#e8c9a0\"/><ellipse cx=\"48\" cy=\"27\" rx=\"15\" ry=\"4\" fill=\"#8a5b3c\"/><path d=\"M37 44h22l-4 20H41z\" fill=\"#d8a36c\"/>", "affettato": "<ellipse cx=\"48\" cy=\"67\" rx=\"38\" ry=\"18\" fill=\"#f4f4ef\" stroke=\"#9eabb0\" stroke-width=\"3\"/><ellipse cx=\"30\" cy=\"59\" rx=\"17\" ry=\"10\" fill=\"#dc7780\" stroke=\"#b84b58\" stroke-width=\"2\"/><ellipse cx=\"49\" cy=\"52\" rx=\"18\" ry=\"11\" fill=\"#d9636b\" stroke=\"#ae414e\" stroke-width=\"2\"/><ellipse cx=\"64\" cy=\"64\" rx=\"18\" ry=\"10\" fill=\"#c94855\" stroke=\"#a73746\" stroke-width=\"2\"/><path d=\"M24 56q7-5 12 0M44 50q7-5 13 0M60 62q6-4 12 0\" fill=\"none\" stroke=\"#ffe5d9\" stroke-width=\"3\"/>"};
+function immagineProdotto(nome) {
+  const n = String(nome||'').toLocaleLowerCase('it-IT').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  let chiave = Object.keys(ICONE_PRODOTTI).find(k=>n.includes(k));
+  if (!chiave) return '<span class="product-picture-fallback">'+infoAlimento(nome).emoji+'</span>';
+  const [emoji,colore]=ICONE_PRODOTTI[chiave];
+  const special=chiave==='caffe'&&n.includes('capsul')?'capsule':chiave;
+  const shape=DISEGNI_PRODOTTI[special]||DISEGNI_PRODOTTI[chiave];
+  const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"><rect width="96" height="96" rx="22" fill="'+colore+'"/>'+(shape||'<text x="48" y="65" text-anchor="middle" font-size="52">'+emoji+'</text>')+'</svg>';
+  return '<img class="product-picture" alt="" src="data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)+'">';
+}
+
 function infoAlimento(nome){
   const n=nome.toLocaleLowerCase('it-IT');
   const categorie=[
     ['Pesce','🐟',/pesce|salmone|tonno|merluzzo|gamber|orata|branzino|sardine/],
     ['Carne','🥩',/carne|pollo|tacchino|manzo|maiale|bistecca|hamburger|affettato|prosciutto|salame|würstel|wurstel/],
-    ['Latticini','🥛',/latte|yogurt|mozzarella|formaggio|burro|ricotta|parmigiano|uova|panna|kefir/],
+    ['Latticini','🧀',/latte|yogurt|mozzarella|formaggio|burro|ricotta|parmigiano|uova|panna|kefir/],
     ['Frutta','🍎',/frutta|mela|banana|arancia|limone|pera|fragol|uva|pesca|kiwi|mandarin|ananas/],
-    ['Verdura','🍅',/verdura|pomodor|insalata|lattuga|carot|zucchin|spinac|broccol|patat|cipolla|peperon/]
+    ['Verdura','🥬',/verdura|pomodor|insalata|lattuga|carot|zucchin|spinac|broccol|patat|cipolla|peperon/]
   ];
   const match=categorie.find(x=>x[2].test(n));
   return match?{categoria:match[0],emoji:match[1]}:{categoria:'Altro',emoji:'🛍️'};
@@ -845,7 +1061,7 @@ function mostraProdotti() {
     const stato=giorni<=0?'danger':giorni<=3?'warning':'good';
     const testo=giorni<0?'Scaduto':giorni===0?'Oggi':giorni===1?'1 giorno':giorni+' giorni';
     const dataFormattata=p.data.split('-').reverse().join('/');
-    return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${info.emoji}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span></div><div class="food-expiry"><div class="days-badge">${testo}</div><span>Scade il<br><strong>${dataFormattata}</strong></span></div><button class="food-actions" onclick="toggleAzioniProdotto(this)" aria-label="Opzioni ${escapeHtml(p.nome)}">⋮</button><div class="food-menu hidden"><button onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})">✏️ Modifica scadenza</button><button class="delete-food" onclick="eliminaProdotto(${JSON.stringify(p.id)})">🗑️ Elimina</button></div></article>`;
+    return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${immagineProdotto(p.nome)}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span></div><div class="food-expiry"><div class="days-badge">${testo}</div><span>Scade il<br><strong>${dataFormattata}</strong></span></div><div class="quantity-control fridge-qty" aria-label="Quantità"><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},-1)" ${((p.quantita||1)<=1)?'disabled':''}>−</button><span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},1)" ${((p.quantita||1)>=10)?'disabled':''}>＋</button></div><div class="fridge-direct-actions"><button class="fridge-edit-btn" onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})" title="Modifica scadenza" aria-label="Modifica la scadenza di ${escapeHtml(p.nome)}">✏️</button><button class="fridge-remove-btn" onclick="eliminaProdotto(${JSON.stringify(p.id)})" title="Elimina prodotto" aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></article>`;
   }).join('');
 }
 function toggleAzioniProdotto(btn){
@@ -853,12 +1069,22 @@ function toggleAzioniProdotto(btn){
   document.querySelectorAll('.food-menu').forEach(x=>{if(x!==menu)x.classList.add('hidden')});
   menu.classList.toggle('hidden');
 }
+function cambiaQuantitaFrigo(id, delta) {
+  const p=prodotti.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  const attuale=Number.isInteger(Number(p.quantita))?Number(p.quantita):1;
+  p.quantita=Math.max(1,Math.min(10,attuale+delta));
+  salvaProdotti();
+  if (!window.VERSIONE_PROVA_LOCALE) sincronizzaScadenze();
+  mostraProdotti();
+}
+
 function modificaScadenzaProdotto(id){
   const p=prodotti.find(x=>String(x.id)===String(id)); if(!p)return;
   const nuova=prompt('Nuova data di scadenza (AAAA-MM-GG):',p.data);
   if(nuova===null)return;
   if(!/^\d{4}-\d{2}-\d{2}$/.test(nuova)||Number.isNaN(new Date(nuova+'T00:00:00').getTime())){alert('Inserisci una data valida, ad esempio 2026-10-15.');return;}
-  p.data=nuova;salvaProdotti();sincronizzaScadenze();mostraProdotti();
+  p.data=nuova;salvaProdotti();if (!window.VERSIONE_PROVA_LOCALE) sincronizzaScadenze();mostraProdotti();
 }
 
 function eliminaProdotto(id) {
@@ -873,10 +1099,10 @@ function apriListaSalvati(destinazione) {
   modificaAbilitata = false;
   document.getElementById("modalSalvati").classList.add("open");
 
-  document.getElementById("modalDestinazione").textContent =
+  document.getElementById("modalDestinazione").innerHTML =
     destinazione === "spesa"
-      ? "Tocca un prodotto per aggiungerlo alla LISTA SPESA."
-      : "Tocca un prodotto per aggiungerlo direttamente a IL MIO FRIGO.";
+      ? 'Tocca <span class="istruzione-plus" aria-label="pulsante verde più">＋</span> per aggiungerlo alla LISTA SPESA.'
+      : 'Tocca <span class="istruzione-plus" aria-label="pulsante verde più">＋</span> per aggiungerlo a IL MIO FRIGO.';
 
   aggiornaControlliModifica();
   mostraListaSalvati();
@@ -924,6 +1150,7 @@ function mostraListaSalvati() {
     if (modificaAbilitata) {
       box.innerHTML += `
         <div class="library-item">
+          <div class="library-category-icon" title="${infoAlimento(p.nome).categoria}" aria-label="${infoAlimento(p.nome).categoria}">${immagineProdotto(p.nome)}</div>
           <div class="library-name">${escapeHtml(p.nome)}</div>
           <div class="library-days">${p.giorni} gg</div>
           <button class="gold" onclick="modificaProdottoSalvato('${p.id}')">✏️</button>
@@ -933,6 +1160,7 @@ function mostraListaSalvati() {
     } else {
       box.innerHTML += `
         <div class="library-item">
+          <div class="library-category-icon" title="${infoAlimento(p.nome).categoria}" aria-label="${infoAlimento(p.nome).categoria}">${immagineProdotto(p.nome)}</div>
           <div class="library-name">${escapeHtml(p.nome)}</div>
           <div class="library-days">${p.giorni} gg</div>
           <button onclick="selezionaSalvato('${p.id}')">＋</button>
