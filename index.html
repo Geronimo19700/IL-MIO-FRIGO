@@ -549,11 +549,9 @@ body.fridge-mode .container{max-width:850px!important}
     </div>
 
     <div class="add-row">
-      <input id="nuovoProdottoSpesa" type="text" placeholder="Cosa vuoi aggiungere alla lista?">
-      <button type="button" id="micSpesa" onclick="avviaVoceSpesa()" title="Inserimento vocale" aria-label="Inserimento vocale">🎤</button>
+      <input id="nuovoProdottoSpesa" type="text" placeholder="Scrivi o detta: latte, pane, mozzarella">
       <button onclick="aggiungiAllaSpesa()">＋ Aggiungi</button>
     </div>
-    <div id="statoVoceSpesa" class="voice-status" aria-live="polite"></div>
 
     
   </div>
@@ -779,19 +777,20 @@ function mostraPagina(pagina) {
 
 function aggiungiAllaSpesa() {
   const input = document.getElementById("nuovoProdottoSpesa");
-  const nome = input.value.trim();
+  const testo = input.value.trim();
+  if (!testo) { alert("Scrivi o detta il prodotto da aggiungere."); return; }
 
-  if (!nome) {
-    alert("Scrivi il prodotto da aggiungere.");
-    return;
+  let nomi = testo.split(/[,;\n]+|\b(?:e poi|poi)\b/gi).map(x=>x.trim()).filter(Boolean);
+  if(nomi.length===1 && /\s+e\s+/i.test(testo)){
+    const tentativo=testo.split(/\s+e\s+/i).map(x=>x.trim()).filter(Boolean);
+    if(tentativo.length>1) nomi=tentativo;
   }
-
-  listaSpesa.push({
-    id: Date.now() + Math.random(),
-    nome: nome,
-    acquistato: false,
-    quantita: 1
-  });
+  nomi.forEach((nome,i)=>listaSpesa.push({
+    id: Date.now()+Math.random()+i,
+    nome,
+    acquistato:false,
+    quantita:1
+  }));
 
   input.value = "";
   salvaListaSpesa();
@@ -1303,82 +1302,6 @@ async function sincronizzaScadenze() {
 }
 
 
-function normalizzaVoce(t){return String(t||'').toLocaleLowerCase('it-IT').replace(/[.,;:!?]/g,' ').replace(/\s+/g,' ').trim();}
-function separaProdottiDettati(testo){
-  const originale=String(testo||'').trim();
-  let parti=originale.split(/[,;]|\b(?:poi|e poi|inoltre)\b/gi).map(x=>x.trim()).filter(Boolean);
-  if(parti.length>1)return parti;
-  const norm=normalizzaVoce(originale);
-  const conosciuti=[...new Set([
-    ...(Array.isArray(prodottiSalvati)?prodottiSalvati.map(x=>x.nome):[]),
-    'pane','pizza','latte','mozzarella','yogurt','uova','insalata','pomodori','pomodoro','banane','banana','mele','mela','pere','pera','arance','arancia','pasta','riso','prosciutto cotto','prosciutto crudo','prosciutto','salame','mortadella','affettato','pollo','carne','pesce','tonno','formaggio','parmigiano','burro','acqua','caffè','cereali','biscotti','patate','cipolle','carote','zucchine','melanzane','fragole','limoni'
-  ].map(x=>normalizzaVoce(x)).filter(Boolean))].sort((x,y)=>y.length-x.length);
-  const trovati=[]; let resto=' '+norm+' ';
-  for(const nome of conosciuti){
-    const needle=' '+nome+' ';
-    if(resto.includes(needle)){trovati.push(nome);resto=resto.replace(needle,' ');}
-  }
-  const residuo=resto.replace(/\b(?:e|poi)\b/g,' ').replace(/\s+/g,' ').trim();
-  if(trovati.length>=2 && !residuo)return trovati;
-  return [originale];
-}
-function inserisciProdottiDettati(testo){
-  const parti=separaProdottiDettati(testo);
-  parti.forEach((nome,i)=>listaSpesa.push({id:Date.now()+Math.random()+i,nome:nome.replace(/\b(?:e|poi)\b$/i,'').trim(),acquistato:false,quantita:1}));
-  if(parti.length){salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();}
-  return parti;
-}
-let riconoscimentoSpesa=null;
-let microfonoSpesaAttivo=false;
-function statoVoce(messaggio,tipo=''){
- const el=document.getElementById('statoVoceSpesa');if(!el)return;
- el.textContent=messaggio;el.className='voice-status '+tipo;
- if(!messaggio)el.style.display='none';else el.style.display='block';
-}
-function avviaVoceSpesa(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Il riconoscimento vocale non è disponibile qui. Su iPhone prova ad aprire l’app da Safari.');return;}
-  const bottone=document.getElementById('micSpesa');
-  if(microfonoSpesaAttivo&&riconoscimentoSpesa){try{riconoscimentoSpesa.stop();}catch(_){} return;}
-  const r=new SR(); riconoscimentoSpesa=r;
-  r.lang='it-IT';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
-  let testoFinale=''; let giaAggiunto=false;
-  r.onstart=()=>{microfonoSpesaAttivo=true;if(bottone)bottone.textContent='⏹️';statoVoce('🔴 STO ASCOLTANDO… parla ora','listening');};
-  r.onspeechstart=()=>statoVoce('🔴 TI SENTO… continua a parlare','listening');
-  r.onresult=e=>{
-    let provvisorio='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const t=e.results[i][0].transcript.trim();
-      if(e.results[i].isFinal)testoFinale+=(testoFinale?' ':'')+t;
-      else provvisorio+=(provvisorio?' ':'')+t;
-    }
-    const visto=(testoFinale+' '+provvisorio).trim();
-    if(visto)statoVoce('🎤 Ho sentito: “'+visto+'”','listening');
-    if(testoFinale.trim()&&!giaAggiunto){
-      giaAggiunto=true;
-      const p=inserisciProdottiDettati(testoFinale);
-      statoVoce('✅ Aggiunti: '+p.join(' · '),'done');
-      setTimeout(()=>statoVoce(''),4500);
-    }
-  };
-  r.onerror=e=>{
-    const er=e.error||'';
-    if(er==='aborted'||er==='no-speech')return;
-    if(er==='not-allowed'||er==='service-not-allowed')statoVoce('Microfono non autorizzato. Consenti il microfono a Safari.','');
-    else statoVoce('Non sono riuscito ad ascoltare. Tocca 🎤 e riprova.','');
-  };
-  r.onend=()=>{
-    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';
-    if(testoFinale.trim()&&!giaAggiunto){
-      giaAggiunto=true;
-      const p=inserisciProdottiDettati(testoFinale);
-      statoVoce('✅ Aggiunti: '+p.join(' · '),'done');
-      setTimeout(()=>statoVoce(''),4500);
-    }
-  };
-  try{r.start();}catch(_){microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';}
-}
-
 aggiornaNomeLista();
 mostraListaSpesa();
 mostraProdotti();
@@ -1392,6 +1315,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.4.2</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.0</div>
 </body>
 </html>
