@@ -329,6 +329,8 @@ button:active { transform: scale(.99); }
 }
 
 .hidden { display: none !important; }
+#micSpesa{font-size:22px;min-width:52px;background:#1565c0!important}
+.archive-item .red{min-width:45px;padding:9px!important}
 </style>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -342,8 +344,8 @@ if (!window.VERSIONE_PROVA_LOCALE) OneSignalDeferred.push(async function(OneSign
     await OneSignal.init({
       appId: "93dc8f8e-0941-4fa3-836f-c3ea747843f8",
       safari_web_id: "web.onesignal.auto.245258f0-6c6a-439f-986f-895149dbff04",
-      serviceWorkerParam: { scope: "/Scadenze-alimentari/" },
-      serviceWorkerPath: "/Scadenze-alimentari/OneSignalSDKWorker.js",
+      serviceWorkerParam: { scope: "/IL-MIO-FRIGO/" },
+      serviceWorkerPath: "/IL-MIO-FRIGO/OneSignalSDKWorker.js",
       notifyButton: { enable: true }
     });
     await OneSignal.login("geronimo19700");
@@ -544,10 +546,11 @@ body.fridge-mode .container{max-width:850px!important}
 
     <div class="add-row">
       <input id="nuovoProdottoSpesa" type="text" placeholder="Cosa vuoi aggiungere alla lista?">
+      <button type="button" id="micSpesa" onclick="avviaVoceSpesa()" title="Inserimento vocale" aria-label="Inserimento vocale">🎤</button>
       <button onclick="aggiungiAllaSpesa()">＋ Aggiungi</button>
     </div>
 
-    <button class="library-button" onclick="apriListaSalvati('spesa')"><span class="saved-icon">▤</span><span>LISTA PRODOTTI SALVATI</span><span class="saved-arrow">›</span></button>
+    
   </div>
 
   <div class="card">
@@ -565,34 +568,12 @@ body.fridge-mode .container{max-width:850px!important}
     <div class="fridge-search-row"><label class="fridge-search" aria-label="Cerca un prodotto"><span>⌕</span><input id="cercaFrigo" type="search" placeholder="Cerca un prodotto..." oninput="mostraProdotti()"></label><button class="fridge-add-toggle" onclick="toggleAggiuntaFrigo()">＋ Aggiungi</button></div>
     <div class="fridge-categories" aria-label="Filtra prodotti"><button class="category-chip selected" data-cat="Tutti" onclick="filtraFrigo('Tutti')">Tutti</button><button class="category-chip" data-cat="Frutta" onclick="filtraFrigo('Frutta')">🍎 Frutta</button><button class="category-chip" data-cat="Verdura" onclick="filtraFrigo('Verdura')">🥬 Verdura</button><button class="category-chip" data-cat="Latticini" onclick="filtraFrigo('Latticini')">🧀 Latticini</button><button class="category-chip" data-cat="Carne" onclick="filtraFrigo('Carne')">🥩 Carne</button><button class="category-chip" data-cat="Pesce" onclick="filtraFrigo('Pesce')">🐟 Pesce</button><button class="category-chip" data-cat="Altro" onclick="filtraFrigo('Altro')">🛍️ Altro</button></div>
   </div>
-  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Nome prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="data">Data di scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi prodotto</button><button class="library-button" onclick="apriListaSalvati('frigo')">📋 LISTA PRODOTTI SALVATI</button></div>
+  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Nome prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="data">Data di scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi prodotto</button></div>
   <button class="fridge-saved-shortcut" onclick="apriListaSalvati('frigo')">▤ &nbsp; LISTA PRODOTTI SALVATI <span>›</span></button>
   <div id="lista" class="fridge-products"></div>
 </section>
 
 </main>
-
-<div id="modalSalvati" class="modal" onclick="chiudiModalSeFuori(event)">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2>📋 Lista prodotti salvati</h2>
-      <button class="close" onclick="chiudiListaSalvati()">✕</button>
-    </div>
-
-    <div id="modalDestinazione" class="small-note"></div>
-
-    <div id="editBox" class="edit-mode">
-      <button class="secondary" style="margin-top:0;width:100%" onclick="attivaModifica()">🔓 Abilita modifica</button>
-    </div>
-
-    <div id="editActions" class="edit-actions">
-      <button class="secondary" onclick="disattivaModifica()">🔒 Blocca modifica</button>
-      <button class="gold" onclick="aggiungiNuovoSalvato()">＋ Nuovo prodotto</button>
-    </div>
-
-    <div id="listaSalvati" class="library-list"></div>
-  </div>
-</div>
 
 <div id="gestioneListe" class="archive-backdrop" role="dialog" aria-modal="true" aria-labelledby="titoloGestioneListe" onclick="if(event.target===this)chiudiGestioneListe()">
  <div class="archive-panel">
@@ -733,10 +714,23 @@ function renderArchivioListe() {
     const name=document.createElement("strong");name.textContent=l.nome;
     const detail=document.createElement("small");detail.textContent=(l.prodotti?.length||0)+" prodotti"+(l.id===idListaAttiva?" · Lista aperta":"");
     info.append(name,detail);
-    const btn=document.createElement("button");btn.type="button";btn.textContent=l.id===idListaAttiva?"Aperta":"Richiama";btn.disabled=l.id===idListaAttiva;btn.onclick=()=>richiamaLista(l.id);
-    r.append(info,btn);box.append(r);
+    const apri=document.createElement("button");apri.type="button";apri.textContent=l.id===idListaAttiva?"Aperta":"Richiama";apri.disabled=l.id===idListaAttiva;apri.onclick=()=>richiamaLista(l.id);
+    const elimina=document.createElement("button");elimina.type="button";elimina.textContent="🗑";elimina.className="red";elimina.title="Elimina definitivamente";elimina.onclick=()=>eliminaListaArchivioDefinitivamente(l.id);
+    r.append(info,apri,elimina);box.append(r);
   });
-  document.getElementById("eliminaListaRichiamata").disabled=!idListaAttiva;
+}
+function eliminaListaArchivioDefinitivamente(id){
+  const l=archivioListe.find(x=>x.id===id); if(!l)return;
+  if(!confirm('Vuoi eliminare definitivamente la lista "'+l.nome+'"?'))return;
+  archivioListe=archivioListe.filter(x=>x.id!==id);
+  localStorage.setItem(CHIAVE_ARCHIVIO_LISTE,JSON.stringify(archivioListe));
+  if(id===idListaAttiva){
+    idListaAttiva=generaIdLista();nomeLista=nomeAutomaticoData();listaSpesa=[];
+    localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
+    localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
+    salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();
+  }
+  renderArchivioListe();
 }
 function richiamaLista(id) {
   const trovata=archivioListe.find(l=>l.id===id);if(!trovata)return;
@@ -898,24 +892,32 @@ function preparaNuovaLista() {
 
 async function trasferisciTuttoInFrigo() {
   if (!listaSpesa.length || !listaSpesa.every(x => x.acquistato)) return;
-  const daTrasferire = [...listaSpesa];
-  const pronti = [];
-  for (const item of daTrasferire) {
-    const salvato = trovaProdottoSalvato(item.nome);
-    if (salvato) { pronti.push({nome:item.nome, giorni:salvato.giorni, quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))}); continue; }
-    const vuoleSalvare = confirm('Vuoi aggiungere "' + item.nome + '" alla LISTA PRODOTTI SALVATI?');
-    const risposta = prompt('Quanti giorni di scadenza vuoi assegnare a "' + item.nome + '"?');
-    if (risposta === null) return;
-    const giorni = Number(risposta);
-    if (!Number.isInteger(giorni) || giorni < 0) { alert('Inserisci un numero di giorni valido.'); return; }
-    pronti.push({nome:item.nome, giorni, vuoleSalvare, quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))});
+  const pronti=[];
+  for(const item of [...listaSpesa]){
+    let salvato=trovaProdottoSalvato(item.nome);
+    let giorni=salvato?Number(salvato.giorni):null;
+    if(!salvato){
+      const suggeriti=durataIndicativa(item.nome);
+      const risposta=prompt('Prodotto nuovo: "'+item.nome+'".\nGiorni di conservazione proposti: '+suggeriti+'\nPuoi modificarli:',suggeriti);
+      if(risposta===null)return;
+      giorni=Number(risposta);
+      if(!Number.isInteger(giorni)||giorni<0){alert('Inserisci un numero di giorni valido.');return;}
+      aggiungiProdottoSalvato(item.nome,giorni);
+    }
+    pronti.push({nome:item.nome,giorni,quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))});
   }
-  pronti.forEach(item => {
-    aggiungiAlFrigoConGiorni(item.nome,item.giorni,item.quantita);
-    if (item.vuoleSalvare) aggiungiProdottoSalvato(item.nome,item.giorni);
-  });
-  archiviaListaAttiva();
-  listaSpesa = []; preparaNuovaLista(); salvaListaSpesa(); mostraListaSpesa(); mostraPagina('frigo');
+  pronti.forEach(x=>aggiungiAlFrigoConGiorni(x.nome,x.giorni,x.quantita));
+  archiviaListaAttiva();listaSpesa=[];preparaNuovaLista();salvaListaSpesa();mostraListaSpesa();mostraPagina('frigo');
+}
+function durataIndicativa(nome){
+ const n=String(nome||'').toLocaleLowerCase('it-IT');
+ const regole=[
+  [/latte/,5],[/yogurt/,20],[/mozzarella/,10],[/ricotta/,5],[/uova/,7],
+  [/affettato|prosciutto|salame/,7],[/pasta fresca/,7],[/pane/,7],
+  [/insalata/,4],[/frutta/,5],[/passata/,7],[/confettura|marmellata/,20],
+  [/ketchup|maionese|senape/,90],[/wurstel|würstel/,30],[/cereali|capsule|caffè/,30]
+ ];
+ const m=regole.find(x=>x[0].test(n)); return m?m[1]:7;
 }
 function trovaProdottoSalvato(nome) {
   const normalizza = s => s.trim().toLocaleUpperCase("it-IT");
@@ -1294,6 +1296,23 @@ async function sincronizzaScadenze() {
   } catch (errore) {
     console.log("Sincronizzazione non riuscita:", errore);
   }
+}
+
+
+function inserisciProdottiDettati(testo){
+  const parti=String(testo||'').split(/,|;|\bpoi\b|\be\b/gi).map(x=>x.trim()).filter(Boolean);
+  parti.forEach((nome,i)=>listaSpesa.push({id:Date.now()+Math.random()+i,nome,acquistato:false,quantita:1}));
+  if(parti.length){salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();}
+}
+function avviaVoceSpesa(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('Il riconoscimento vocale non è disponibile in questo browser.');return;}
+  const r=new SR();r.lang='it-IT';r.interimResults=false;r.continuous=false;
+  const b=document.getElementById('micSpesa');if(b)b.textContent='🎙️';
+  r.onresult=e=>inserisciProdottiDettati(e.results[0][0].transcript);
+  r.onerror=e=>alert('Microfono non disponibile: '+e.error);
+  r.onend=()=>{if(b)b.textContent='🎤';};
+  r.start();
 }
 
 aggiornaNomeLista();
