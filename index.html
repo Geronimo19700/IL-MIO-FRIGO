@@ -330,6 +330,10 @@ button:active { transform: scale(.99); }
 
 .hidden { display: none !important; }
 #micSpesa{font-size:22px;min-width:52px;background:#1565c0!important}
+.voice-status{display:none;margin-top:10px;padding:10px 12px;border-radius:12px;font-weight:800;text-align:center;background:#fff3cd;color:#5f4700}
+.voice-status.listening{display:block;background:#ffe1e1;color:#8b0000;animation:voicePulse 1s infinite alternate}
+.voice-status.done{display:block;background:#e4f5e8;color:#175c2b}
+@keyframes voicePulse{from{transform:scale(1)}to{transform:scale(1.015)}}
 .archive-item .red{min-width:45px;padding:9px!important}
 </style>
 
@@ -549,6 +553,7 @@ body.fridge-mode .container{max-width:850px!important}
       <button type="button" id="micSpesa" onclick="avviaVoceSpesa()" title="Inserimento vocale" aria-label="Inserimento vocale">🎤</button>
       <button onclick="aggiungiAllaSpesa()">＋ Aggiungi</button>
     </div>
+    <div id="statoVoceSpesa" class="voice-status" aria-live="polite"></div>
 
     
   </div>
@@ -1298,55 +1303,73 @@ async function sincronizzaScadenze() {
 }
 
 
+function normalizzaVoce(t){return String(t||'').toLocaleLowerCase('it-IT').replace(/[.,;:!?]/g,' ').replace(/\s+/g,' ').trim();}
+function separaProdottiDettati(testo){
+  const originale=String(testo||'').trim();
+  let parti=originale.split(/[,;]|\b(?:poi|e poi|inoltre)\b/gi).map(x=>x.trim()).filter(Boolean);
+  if(parti.length>1)return parti;
+  const norm=normalizzaVoce(originale);
+  const conosciuti=[...new Set([
+    ...(Array.isArray(prodottiSalvati)?prodottiSalvati.map(x=>x.nome):[]),
+    'pane','pizza','latte','mozzarella','yogurt','uova','insalata','pomodori','pomodoro','banane','banana','mele','mela','pere','pera','arance','arancia','pasta','riso','prosciutto cotto','prosciutto crudo','prosciutto','salame','mortadella','affettato','pollo','carne','pesce','tonno','formaggio','parmigiano','burro','acqua','caffè','cereali','biscotti','patate','cipolle','carote','zucchine','melanzane','fragole','limoni'
+  ].map(x=>normalizzaVoce(x)).filter(Boolean))].sort((x,y)=>y.length-x.length);
+  const trovati=[]; let resto=' '+norm+' ';
+  for(const nome of conosciuti){
+    const needle=' '+nome+' ';
+    if(resto.includes(needle)){trovati.push(nome);resto=resto.replace(needle,' ');}
+  }
+  const residuo=resto.replace(/\b(?:e|poi)\b/g,' ').replace(/\s+/g,' ').trim();
+  if(trovati.length>=2 && !residuo)return trovati;
+  return [originale];
+}
 function inserisciProdottiDettati(testo){
-  const parti=String(testo||'').split(/,|;|\bpoi\b|\be\b/gi).map(x=>x.trim()).filter(Boolean);
-  parti.forEach((nome,i)=>listaSpesa.push({id:Date.now()+Math.random()+i,nome,acquistato:false,quantita:1}));
+  const parti=separaProdottiDettati(testo);
+  parti.forEach((nome,i)=>listaSpesa.push({id:Date.now()+Math.random()+i,nome:nome.replace(/\b(?:e|poi)\b$/i,'').trim(),acquistato:false,quantita:1}));
   if(parti.length){salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();}
+  return parti;
 }
 let riconoscimentoSpesa=null;
 let microfonoSpesaAttivo=false;
+function statoVoce(messaggio,tipo=''){
+ const el=document.getElementById('statoVoceSpesa');if(!el)return;
+ el.textContent=messaggio;el.className='voice-status '+tipo;
+ if(!messaggio)el.style.display='none';else el.style.display='block';
+}
 function avviaVoceSpesa(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    alert('Il riconoscimento vocale non è disponibile qui. Su iPhone prova ad aprire l’app da Safari.');
-    return;
-  }
-  const b=document.getElementById('micSpesa');
-  if(microfonoSpesaAttivo&&riconoscimentoSpesa){
-    try{riconoscimentoSpesa.stop();}catch(_){}
-    return;
-  }
-  const r=new SR();
-  riconoscimentoSpesa=r;
-  r.lang='it-IT';
-  r.interimResults=false;
-  r.continuous=false;
-  r.maxAlternatives=1;
-  let ricevuto=false;
-  r.onstart=()=>{microfonoSpesaAttivo=true;if(b){b.textContent='⏹️';b.title='Tocca per terminare';}};
+  if(!SR){alert('Il riconoscimento vocale non è disponibile qui. Su iPhone prova ad aprire l’app da Safari.');return;}
+  const bottone=document.getElementById('micSpesa');
+  if(microfonoSpesaAttivo&&riconoscimentoSpesa){try{riconoscimentoSpesa.stop();}catch(_){} return;}
+  const r=new SR(); riconoscimentoSpesa=r;
+  r.lang='it-IT';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
+  let testoFinale='';
+  r.onstart=()=>{microfonoSpesaAttivo=true;if(bottone)bottone.textContent='⏹️';statoVoce('🔴 STO ASCOLTANDO… parla ora','listening');};
+  r.onspeechstart=()=>statoVoce('🔴 TI SENTO… continua a parlare','listening');
   r.onresult=e=>{
-    ricevuto=true;
-    const testo=e.results?.[0]?.[0]?.transcript||'';
-    if(testo.trim())inserisciProdottiDettati(testo);
+    let provvisorio='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript.trim();
+      if(e.results[i].isFinal)testoFinale+=(testoFinale?' ':'')+t;else provvisorio+=(provvisorio?' ':'')+t;
+    }
+    const visto=(testoFinale+' '+provvisorio).trim();
+    if(visto)statoVoce('🎤 Ho sentito: “'+visto+'”','listening');
   };
   r.onerror=e=>{
-    const errore=e.error||'';
-    if(errore==='aborted'||errore==='no-speech')return;
-    if(errore==='not-allowed'||errore==='service-not-allowed'){
-      alert('Per usare il microfono devi consentire a Safari l’accesso al microfono.');
-    }else{
-      alert('Non riesco a usare il microfono. Riprova.');
-    }
+    const er=e.error||'';
+    if(er==='aborted'){statoVoce('Ascolto interrotto. Tocca 🎤 per riprovare.','');return;}
+    if(er==='no-speech'){statoVoce('Non ho sentito nulla. Tocca 🎤 e riprova.','');return;}
+    if(er==='not-allowed'||er==='service-not-allowed'){statoVoce('Microfono non autorizzato. Consenti il microfono a Safari.','');return;}
+    statoVoce('Non sono riuscito ad ascoltare. Tocca 🎤 e riprova.','');
   };
   r.onend=()=>{
-    microfonoSpesaAttivo=false;
-    riconoscimentoSpesa=null;
-    if(b){b.textContent='🎤';b.title='Inserimento vocale';}
+    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';
+    if(testoFinale.trim()){
+      const p=inserisciProdottiDettati(testoFinale);
+      statoVoce('✅ Aggiunti: '+p.join(' · '),'done');
+      setTimeout(()=>statoVoce(''),4500);
+    }
   };
-  try{r.start();}catch(e){
-    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;
-    if(b)b.textContent='🎤';
-  }
+  try{r.start();}catch(_){microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';statoVoce('Tocca di nuovo 🎤 per parlare.','');}
 }
 
 aggiornaNomeLista();
