@@ -898,15 +898,9 @@ async function trasferisciTuttoInFrigo() {
   const pronti=[];
   for(const item of [...listaSpesa]){
     let salvato=trovaProdottoSalvato(item.nome);
-    let giorni=salvato?Number(salvato.giorni):null;
-    if(!salvato){
-      const suggeriti=durataIndicativa(item.nome);
-      const risposta=prompt('Prodotto nuovo: "'+item.nome+'".\nGiorni di conservazione proposti: '+suggeriti+'\nPuoi modificarli:',suggeriti);
-      if(risposta===null)return;
-      giorni=Number(risposta);
-      if(!Number.isInteger(giorni)||giorni<0){alert('Inserisci un numero di giorni valido.');return;}
-      aggiungiProdottoSalvato(item.nome,giorni);
-    }
+    let giorni=salvato?Number(salvato.giorni):durataIndicativa(item.nome);
+    if(!Number.isFinite(giorni)||giorni<0) giorni=7;
+    if(!salvato) aggiungiProdottoSalvato(item.nome,giorni);
     pronti.push({nome:item.nome,giorni,quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))});
   }
   pronti.forEach(x=>aggiungiAlFrigoConGiorni(x.nome,x.giorni,x.quantita));
@@ -1309,7 +1303,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.5.1';
+    const versioneCorrente='2.5.2';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1317,9 +1311,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=251')){
+      if(!location.search.includes('appv=252')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','251');
+        u.searchParams.set('appv','252');
         location.replace(u.toString());
       }
     }
@@ -1335,6 +1329,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.1</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.2</div>
 </body>
 </html>
