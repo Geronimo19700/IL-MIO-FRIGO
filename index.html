@@ -537,9 +537,14 @@ body.fridge-mode .container{max-width:850px!important}
 .onesignal-slidedown-container{display:none!important}
 </style>
 <style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style><style id="nav-art-fix-272">
-.top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:contain!important;background-position:center!important;background-repeat:no-repeat!important}
 .top-nav .nav-freezer::before,.top-nav .nav-freezer::after,.top-nav .nav-dispensa::before,.top-nav .nav-dispensa::after{content:none!important}
 .onesignal-bell-container,.onesignal-bell-launcher,.onesignal-slidedown-container{display:none!important}
+</style><style id="iphone-ui-cleanup-273">
+#onesignal-bell-container,#onesignal-slidedown-container,
+.onesignal-bell-container,.onesignal-bell-launcher,.onesignal-slidedown-container,
+[class*="onesignal-bell"],[id*="onesignal-bell"],[class*="onesignal-slidedown"],[id*="onesignal-slidedown"]{display:none!important;visibility:hidden!important;width:0!important;height:0!important;overflow:hidden!important}
+.top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:contain!important;background-position:center center!important;background-repeat:no-repeat!important;background-origin:content-box!important}
 </style></head>
 
 <body>
@@ -1273,7 +1278,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.7.2';
+    const versioneCorrente='2.7.3';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1281,9 +1286,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=272')){
+      if(!location.search.includes('appv=273')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','272');
+        u.searchParams.set('appv','273');
         location.replace(u.toString());
       }
     }
@@ -1299,6 +1304,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.2</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.3</div>
 </body>
 </html>
