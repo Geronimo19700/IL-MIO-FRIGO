@@ -1303,15 +1303,50 @@ function inserisciProdottiDettati(testo){
   parti.forEach((nome,i)=>listaSpesa.push({id:Date.now()+Math.random()+i,nome,acquistato:false,quantita:1}));
   if(parti.length){salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();}
 }
+let riconoscimentoSpesa=null;
+let microfonoSpesaAttivo=false;
 function avviaVoceSpesa(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('Il riconoscimento vocale non è disponibile in questo browser.');return;}
-  const r=new SR();r.lang='it-IT';r.interimResults=false;r.continuous=false;
-  const b=document.getElementById('micSpesa');if(b)b.textContent='🎙️';
-  r.onresult=e=>inserisciProdottiDettati(e.results[0][0].transcript);
-  r.onerror=e=>alert('Microfono non disponibile: '+e.error);
-  r.onend=()=>{if(b)b.textContent='🎤';};
-  r.start();
+  if(!SR){
+    alert('Il riconoscimento vocale non è disponibile qui. Su iPhone prova ad aprire l’app da Safari.');
+    return;
+  }
+  const b=document.getElementById('micSpesa');
+  if(microfonoSpesaAttivo&&riconoscimentoSpesa){
+    try{riconoscimentoSpesa.stop();}catch(_){}
+    return;
+  }
+  const r=new SR();
+  riconoscimentoSpesa=r;
+  r.lang='it-IT';
+  r.interimResults=false;
+  r.continuous=false;
+  r.maxAlternatives=1;
+  let ricevuto=false;
+  r.onstart=()=>{microfonoSpesaAttivo=true;if(b){b.textContent='⏹️';b.title='Tocca per terminare';}};
+  r.onresult=e=>{
+    ricevuto=true;
+    const testo=e.results?.[0]?.[0]?.transcript||'';
+    if(testo.trim())inserisciProdottiDettati(testo);
+  };
+  r.onerror=e=>{
+    const errore=e.error||'';
+    if(errore==='aborted'||errore==='no-speech')return;
+    if(errore==='not-allowed'||errore==='service-not-allowed'){
+      alert('Per usare il microfono devi consentire a Safari l’accesso al microfono.');
+    }else{
+      alert('Non riesco a usare il microfono. Riprova.');
+    }
+  };
+  r.onend=()=>{
+    microfonoSpesaAttivo=false;
+    riconoscimentoSpesa=null;
+    if(b){b.textContent='🎤';b.title='Inserimento vocale';}
+  };
+  try{r.start();}catch(e){
+    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;
+    if(b)b.textContent='🎤';
+  }
 }
 
 aggiornaNomeLista();
