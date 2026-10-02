@@ -1342,34 +1342,41 @@ function avviaVoceSpesa(){
   if(microfonoSpesaAttivo&&riconoscimentoSpesa){try{riconoscimentoSpesa.stop();}catch(_){} return;}
   const r=new SR(); riconoscimentoSpesa=r;
   r.lang='it-IT';r.interimResults=true;r.continuous=false;r.maxAlternatives=1;
-  let testoFinale='';
+  let testoFinale=''; let giaAggiunto=false;
   r.onstart=()=>{microfonoSpesaAttivo=true;if(bottone)bottone.textContent='⏹️';statoVoce('🔴 STO ASCOLTANDO… parla ora','listening');};
   r.onspeechstart=()=>statoVoce('🔴 TI SENTO… continua a parlare','listening');
   r.onresult=e=>{
     let provvisorio='';
     for(let i=e.resultIndex;i<e.results.length;i++){
       const t=e.results[i][0].transcript.trim();
-      if(e.results[i].isFinal)testoFinale+=(testoFinale?' ':'')+t;else provvisorio+=(provvisorio?' ':'')+t;
+      if(e.results[i].isFinal)testoFinale+=(testoFinale?' ':'')+t;
+      else provvisorio+=(provvisorio?' ':'')+t;
     }
     const visto=(testoFinale+' '+provvisorio).trim();
     if(visto)statoVoce('🎤 Ho sentito: “'+visto+'”','listening');
-  };
-  r.onerror=e=>{
-    const er=e.error||'';
-    if(er==='aborted'){statoVoce('Ascolto interrotto. Tocca 🎤 per riprovare.','');return;}
-    if(er==='no-speech'){statoVoce('Non ho sentito nulla. Tocca 🎤 e riprova.','');return;}
-    if(er==='not-allowed'||er==='service-not-allowed'){statoVoce('Microfono non autorizzato. Consenti il microfono a Safari.','');return;}
-    statoVoce('Non sono riuscito ad ascoltare. Tocca 🎤 e riprova.','');
-  };
-  r.onend=()=>{
-    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';
-    if(testoFinale.trim()){
+    if(testoFinale.trim()&&!giaAggiunto){
+      giaAggiunto=true;
       const p=inserisciProdottiDettati(testoFinale);
       statoVoce('✅ Aggiunti: '+p.join(' · '),'done');
       setTimeout(()=>statoVoce(''),4500);
     }
   };
-  try{r.start();}catch(_){microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';statoVoce('Tocca di nuovo 🎤 per parlare.','');}
+  r.onerror=e=>{
+    const er=e.error||'';
+    if(er==='aborted'||er==='no-speech')return;
+    if(er==='not-allowed'||er==='service-not-allowed')statoVoce('Microfono non autorizzato. Consenti il microfono a Safari.','');
+    else statoVoce('Non sono riuscito ad ascoltare. Tocca 🎤 e riprova.','');
+  };
+  r.onend=()=>{
+    microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';
+    if(testoFinale.trim()&&!giaAggiunto){
+      giaAggiunto=true;
+      const p=inserisciProdottiDettati(testoFinale);
+      statoVoce('✅ Aggiunti: '+p.join(' · '),'done');
+      setTimeout(()=>statoVoce(''),4500);
+    }
+  };
+  try{r.start();}catch(_){microfonoSpesaAttivo=false;riconoscimentoSpesa=null;if(bottone)bottone.textContent='🎤';}
 }
 
 aggiornaNomeLista();
@@ -1385,6 +1392,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.4.1</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.4.2</div>
 </body>
 </html>
