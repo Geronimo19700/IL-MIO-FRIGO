@@ -354,7 +354,7 @@ if (!window.VERSIONE_PROVA_LOCALE) OneSignalDeferred.push(async function(OneSign
       safari_web_id: "web.onesignal.auto.245258f0-6c6a-439f-986f-895149dbff04",
       serviceWorkerParam: { scope: "/IL-MIO-FRIGO/" },
       serviceWorkerPath: "/IL-MIO-FRIGO/OneSignalSDKWorker.js",
-      notifyButton: { enable: true }
+      notifyButton: { enable: false }
     });
     await OneSignal.login("geronimo19700");
   } catch (e) {
@@ -536,7 +536,11 @@ body.fridge-mode .container{max-width:850px!important}
 .top-nav::before,.top-nav::after{content:none!important;display:none!important}
 .onesignal-slidedown-container{display:none!important}
 </style>
-<style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style></head>
+<style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style><style id="nav-art-fix-272">
+.top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:cover!important;background-position:center!important;background-repeat:no-repeat!important}
+.top-nav .nav-freezer::before,.top-nav .nav-freezer::after,.top-nav .nav-dispensa::before,.top-nav .nav-dispensa::after{content:none!important}
+.onesignal-bell-container,.onesignal-bell-launcher,.onesignal-slidedown-container{display:none!important}
+</style></head>
 
 <body>
 
