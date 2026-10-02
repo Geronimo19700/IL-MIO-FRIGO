@@ -2,6 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
+<meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="manifest" href="manifest.json?v=3">
 <link rel="apple-touch-icon" href="/IL-MIO-FRIGO/icon-180.png?v=3">
@@ -547,7 +548,7 @@ body.fridge-mode .container{max-width:850px!important}
 .top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:contain!important;background-position:center center!important;background-repeat:no-repeat!important;background-origin:content-box!important}
 </style></head>
 
-<body>
+<body class="notranslate" translate="no">
 
 <nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button><button id="navFreezer" class="nav-freezer nav-coming" onclick="mostraPagina('freezer')" aria-label="Freezer"></button><button id="navDispensa" class="nav-dispensa nav-coming" onclick="mostraPagina('dispensa')" aria-label="Dispensa"></button></nav>
 
@@ -809,11 +810,14 @@ function mostraPagina(pagina) {
   [["navSpesa",spesa],["navFrigo",frigo],["navFreezer",freezer],["navDispensa",dispensa]].forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.classList.toggle("active",on)});
   if(frigo) mostraProdotti(); else if(spesa) mostraListaSpesa(); else if(freezer) mostraFreezer(); else if(dispensa) mostraDispensa();
 }
+function testoProdottoNormalizzato(v){
+ return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+}
 function salvaDepositi(){ localStorage.setItem(CHIAVE_FREEZER,JSON.stringify(prodottiFreezer)); localStorage.setItem(CHIAVE_DISPENSA,JSON.stringify(prodottiDispensa)); }
 function destinazioneProdotto(nome){
- const n=String(nome||"").toLocaleLowerCase("it-IT");
- if(/surgelat|congelat|gelato|ghiacciolo|pizza/.test(n)) return "freezer";
- if(/latte|yogurt|mozzarella|ricotta|uova|affettato|prosciutto|salame|wurstel|würstel|pasta fresca|insalata|frutta|verdura fresca|carne fresca|pesce/.test(n)) return "frigo";
+ const n=testoProdottoNormalizzato(nome);
+ if(/surgelat|congelat|frozen|congelad|helado|ghiacciolo|ice cream|pizza/.test(n)) return "freezer";
+ if(/latte|leche|milk|yogurt|yoghurt|mozzarella|ricotta|uova|huevo|egg|affettato|prosciutto|jamon|ham|salame|salami|wurstel|pasta fresca|insalata|ensalada|salad|frutta|fruta|fruit|verdura fresca|vegetal|vegetable|carne|meat|pesce|pescado|fish/.test(n)) return "frigo";
  return "dispensa";
 }
 function mostraFreezer(){ const b=document.getElementById("listaFreezer"); b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>'<div class="storage-item"><span>❄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">Il Freezer è vuoto.</div>'; }
@@ -824,9 +828,9 @@ function aggiungiAllaSpesa() {
   const testo = input.value.trim();
   if (!testo) { alert("Scrivi o detta il prodotto da aggiungere."); return; }
 
-  let nomi = testo.split(/[,;\n]+|\b(?:e poi|poi)\b/gi).map(x=>x.trim()).filter(Boolean);
-  if(nomi.length===1 && /\s+e\s+/i.test(testo)){
-    const tentativo=testo.split(/\s+e\s+/i).map(x=>x.trim()).filter(Boolean);
+  let nomi = testo.split(/[,;\n]+|\b(?:e poi|poi|y luego|luego|and then|then)\b/gi).map(x=>x.trim()).filter(Boolean);
+  if(nomi.length===1 && /\s+(?:e|y|and)\s+/i.test(testo)){
+    const tentativo=testo.split(/\s+(?:e|y|and)\s+/i).map(x=>x.trim()).filter(Boolean);
     if(tentativo.length>1) nomi=tentativo;
   }
   nomi.forEach((nome,i)=>listaSpesa.push({
@@ -1074,11 +1078,11 @@ function immagineProdotto(nome) {
 }
 
 function infoAlimento(nome){
-  const n=nome.toLocaleLowerCase('it-IT');
+  const n=testoProdottoNormalizzato(nome);
   const categorie=[
-    ['Pesce','🐟',/pesce|salmone|tonno|merluzzo|gamber|orata|branzino|sardine/],
-    ['Carne','🥩',/carne|pollo|tacchino|manzo|maiale|bistecca|hamburger|affettato|prosciutto|salame|würstel|wurstel/],
-    ['Latticini','🧀',/latte|yogurt|mozzarella|formaggio|burro|ricotta|parmigiano|uova|panna|kefir/],
+    ['Pesce','🐟',/pesce|pescado|fish|salmone|salmon|tonno|atun|tuna|merluzzo|bacalao|cod|gamber|camaron|shrimp|orata|branzino|sardine/],
+    ['Carne','🥩',/carne|meat|pollo|chicken|tacchino|pavo|turkey|manzo|beef|maiale|cerdo|pork|bistecca|steak|hamburger|affettato|prosciutto|jamon|ham|salame|salami|wurstel/],
+    ['Latticini','🧀',/latte|leche|milk|yogurt|yoghurt|mozzarella|formaggio|queso|cheese|burro|mantequilla|butter|ricotta|parmigiano|uova|huevo|egg|panna|nata|cream|kefir/],
     ['Frutta','🍎',/frutta|mela|banana|arancia|limone|pera|fragol|uva|pesca|kiwi|mandarin|ananas/],
     ['Verdura','🥬',/verdura|pomodor|insalata|lattuga|carot|zucchin|spinac|broccol|patat|cipolla|peperon/]
   ];
@@ -1278,7 +1282,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.7.3';
+    const versioneCorrente='2.8.0';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1286,9 +1290,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=273')){
+      if(!location.search.includes('appv=280')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','273');
+        u.searchParams.set('appv','280');
         location.replace(u.toString());
       }
     }
@@ -1304,6 +1308,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.3</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.8.0</div>
 </body>
 </html>
