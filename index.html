@@ -530,12 +530,16 @@ body.fridge-mode .container{max-width:850px!important}
 .top-nav .nav-freezer{background:linear-gradient(145deg,#d9f7ff 0%,#58c7ef 45%,#1689ce 100%)!important;box-shadow:inset 0 0 22px rgba(255,255,255,.8),0 5px 12px rgba(24,120,170,.2)!important}
 .top-nav .nav-dispensa{background:linear-gradient(145deg,#e2ad61 0%,#a76525 52%,#744018 100%)!important;box-shadow:inset 0 0 20px rgba(255,225,166,.45),0 5px 12px rgba(99,57,22,.2)!important}
 .nav-new-icon{position:absolute;top:12px;right:14px;font-size:28px}.nav-new-art{font-size:clamp(45px,14vw,86px);line-height:.9}.nav-coming strong{position:relative;margin-top:8px}
+
+.storage-page{padding-top:8px}.storage-hero{border-radius:28px;padding:24px 16px;text-align:center;margin-bottom:16px}.freezer-hero{background:linear-gradient(145deg,#e6fbff,#87d9f6);color:#176b93}.pantry-hero{background:linear-gradient(145deg,#f5d9ae,#c58a4c);color:#70431f}.storage-big-icon{font-size:64px}.storage-hero h1{margin:5px 0;font-size:30px}.storage-hero p{margin:0;font-weight:700}.storage-item{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:10px;padding:13px 8px;border-bottom:1px solid #eee;font-size:17px}
+.onesignal-bell-container,.onesignal-bell-container-bottom-right{left:50%!important;right:auto!important;transform:translateX(-50%)!important}
+.top-nav::before,.top-nav::after{content:none!important;display:none!important}
 </style>
 <style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style></head>
 
 <body>
 
-<nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button><button class="nav-freezer nav-coming" onclick="sezioneInLavorazione('Freezer')" aria-label="Freezer"><span class="nav-new-icon">❄️</span><span class="nav-new-art">🧊</span><strong>Freezer</strong></button><button class="nav-dispensa nav-coming" onclick="sezioneInLavorazione('Dispensa')" aria-label="Dispensa"><span class="nav-new-icon">🏺</span><span class="nav-new-art">🗄️</span><strong>Dispensa</strong></button></nav>
+<nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button><button id="navFreezer" class="nav-freezer nav-coming" onclick="mostraPagina('freezer')" aria-label="Freezer"><span class="nav-new-icon">❄️</span><span class="nav-new-art">🧊</span><strong>Freezer</strong></button><button id="navDispensa" class="nav-dispensa nav-coming" onclick="mostraPagina('dispensa')" aria-label="Dispensa"><span class="nav-new-icon">🏺</span><span class="nav-new-art">🗄️</span><strong>Dispensa</strong></button></nav>
 
 <header id="headerSpesa" class="header-spesa">
   
@@ -571,7 +575,7 @@ body.fridge-mode .container{max-width:850px!important}
     <h2 class="products-title"><span class="products-icon">🛒</span><span>Prodotti da<br>acquistare</span><span class="products-arrow" aria-hidden="true">›</span></h2>
     <div id="listaSpesa"></div>
     <button id="tuttoInFrigo" class="all-purchased" onclick="trasferisciTuttoInFrigo()">
-      🧊 Vuoi mettere tutto in frigo?
+      📦 Sistema la spesa
     </button>
   </div>
 
@@ -586,6 +590,15 @@ body.fridge-mode .container{max-width:850px!important}
   <div id="lista" class="fridge-products"></div>
 </section>
 
+
+<section id="paginaFreezer" class="page storage-page">
+  <div class="storage-hero freezer-hero"><div class="storage-big-icon">❄️🧊</div><h1>Il mio Freezer</h1><p>Prodotti surgelati e congelati</p></div>
+  <div class="card"><h2>❄️ Prodotti nel Freezer</h2><div id="listaFreezer"></div></div>
+</section>
+<section id="paginaDispensa" class="page storage-page">
+  <div class="storage-hero pantry-hero"><div class="storage-big-icon">🏺🗄️</div><h1>La mia Dispensa</h1><p>Prodotti che non richiedono frigorifero o freezer</p></div>
+  <div class="card"><h2>🗄️ Prodotti in Dispensa</h2><div id="listaDispensa"></div></div>
+</section>
 </main>
 
 <div id="gestioneListe" class="archive-backdrop" role="dialog" aria-modal="true" aria-labelledby="titoloGestioneListe" onclick="if(event.target===this)chiudiGestioneListe()">
@@ -613,6 +626,10 @@ const CHIAVE_PRODOTTI_SALVATI = "prodottiSalvati";
 const CHIAVE_NOME_LISTA = "nomeListaSpesa";
 const CHIAVE_ARCHIVIO_LISTE = "archivioListeSpesa_v1";
 const CHIAVE_ID_LISTA = "idListaSpesaAttiva_v1";
+const CHIAVE_FREEZER = "prodottiFreezer_v1";
+const CHIAVE_DISPENSA = "prodottiDispensa_v1";
+let prodottiFreezer = JSON.parse(localStorage.getItem(CHIAVE_FREEZER) || "[]");
+let prodottiDispensa = JSON.parse(localStorage.getItem(CHIAVE_DISPENSA) || "[]");
 
 const prodottiInizialiSalvati = [
   {nome:"AFFETTATO", giorni:7},
@@ -773,20 +790,24 @@ function eliminaListaAttualeDaGestione() {
 function sezioneInLavorazione(nome) { alert(nome + ": in lavorazione"); }
 
 function mostraPagina(pagina) {
-  const spesa = pagina === "spesa";
-  document.body.classList.toggle("fridge-mode", !spesa);
-  document.body.classList.toggle("fridge-theme", !spesa);
-
-  document.getElementById("paginaSpesa").classList.toggle("active", spesa);
-  document.getElementById("paginaFrigo").classList.toggle("active", !spesa);
+  const spesa = pagina === "spesa", frigo = pagina === "frigo", freezer = pagina === "freezer", dispensa = pagina === "dispensa";
+  document.body.classList.toggle("fridge-mode", frigo);
+  document.body.classList.toggle("fridge-theme", frigo);
+  ["Spesa","Frigo","Freezer","Dispensa"].forEach(n=>{ const el=document.getElementById("pagina"+n); if(el) el.classList.toggle("active", pagina===n.toLowerCase()); });
   document.getElementById("headerSpesa").classList.toggle("hidden", !spesa);
-  document.getElementById("headerFrigo").classList.toggle("hidden", spesa);
-  document.getElementById("navSpesa").classList.toggle("active", spesa);
-  document.getElementById("navFrigo").classList.toggle("active", !spesa);
-
-  if (!spesa) mostraProdotti();
-  else mostraListaSpesa();
+  document.getElementById("headerFrigo").classList.toggle("hidden", !frigo);
+  [["navSpesa",spesa],["navFrigo",frigo],["navFreezer",freezer],["navDispensa",dispensa]].forEach(([id,on])=>{const el=document.getElementById(id);if(el)el.classList.toggle("active",on)});
+  if(frigo) mostraProdotti(); else if(spesa) mostraListaSpesa(); else if(freezer) mostraFreezer(); else if(dispensa) mostraDispensa();
 }
+function salvaDepositi(){ localStorage.setItem(CHIAVE_FREEZER,JSON.stringify(prodottiFreezer)); localStorage.setItem(CHIAVE_DISPENSA,JSON.stringify(prodottiDispensa)); }
+function destinazioneProdotto(nome){
+ const n=String(nome||"").toLocaleLowerCase("it-IT");
+ if(/surgelat|congelat|gelato|ghiacciolo|pizza/.test(n)) return "freezer";
+ if(/latte|yogurt|mozzarella|ricotta|uova|affettato|prosciutto|salame|wurstel|würstel|pasta fresca|insalata|frutta|verdura fresca|carne fresca|pesce fresco/.test(n)) return "frigo";
+ return "dispensa";
+}
+function mostraFreezer(){ const b=document.getElementById("listaFreezer"); b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>'<div class="storage-item"><span>❄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">Il Freezer è vuoto.</div>'; }
+function mostraDispensa(){ const b=document.getElementById("listaDispensa"); b.innerHTML=prodottiDispensa.length?prodottiDispensa.map(p=>'<div class="storage-item"><span>🗄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">La Dispensa è vuota.</div>'; }
 
 function aggiungiAllaSpesa() {
   const input = document.getElementById("nuovoProdottoSpesa");
@@ -908,17 +929,22 @@ function preparaNuovaLista() {
 
 async function trasferisciTuttoInFrigo() {
   if (!listaSpesa.length || !listaSpesa.every(x => x.acquistato)) return;
-  const pronti=[];
   for(const item of [...listaSpesa]){
-    let salvato=trovaProdottoSalvato(item.nome);
-    let giorni=salvato?Number(salvato.giorni):durataIndicativa(item.nome);
-    if(!Number.isFinite(giorni)||giorni<0) giorni=7;
-    if(!salvato) aggiungiProdottoSalvato(item.nome,giorni);
-    pronti.push({nome:item.nome,giorni,quantita:Math.max(1,Math.min(10,Number(item.quantita)||1))});
+    const q=Math.max(1,Math.min(10,Number(item.quantita)||1));
+    const d=destinazioneProdotto(item.nome);
+    if(d==="freezer") prodottiFreezer.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q});
+    else if(d==="dispensa") prodottiDispensa.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q});
+    else {
+      let salvato=trovaProdottoSalvato(item.nome), giorni=salvato?Number(salvato.giorni):durataIndicativa(item.nome);
+      if(!Number.isFinite(giorni)||giorni<0) giorni=7;
+      if(!salvato) aggiungiProdottoSalvato(item.nome,giorni);
+      aggiungiAlFrigoConGiorni(item.nome,giorni,q);
+    }
   }
-  pronti.forEach(x=>aggiungiAlFrigoConGiorni(x.nome,x.giorni,x.quantita));
-  archiviaListaAttiva();listaSpesa=[];preparaNuovaLista();salvaListaSpesa();mostraListaSpesa();mostraPagina('frigo');
+  salvaDepositi(); archiviaListaAttiva(); listaSpesa=[]; preparaNuovaLista(); salvaListaSpesa(); mostraListaSpesa();
+  alert("Spesa sistemata tra Frigo, Freezer e Dispensa.");
 }
+
 function durataIndicativa(nome){
  const n=String(nome||'').toLocaleLowerCase('it-IT');
  const regole=[
@@ -1243,7 +1269,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.6.0';
+    const versioneCorrente='2.7.0';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1251,9 +1277,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=260')){
+      if(!location.search.includes('appv=270')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','260');
+        u.searchParams.set('appv','270');
         location.replace(u.toString());
       }
     }
@@ -1269,6 +1295,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.6.0</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.0</div>
 </body>
 </html>
