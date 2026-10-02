@@ -335,6 +335,10 @@ button:active { transform: scale(.99); }
 .voice-status.done{display:block;background:#e4f5e8;color:#175c2b}
 @keyframes voicePulse{from{transform:scale(1)}to{transform:scale(1.015)}}
 .archive-item .red{min-width:45px;padding:9px!important}
+
+.dictation-hint{margin-top:10px;padding:10px 12px 4px;font-size:14px;font-weight:700;color:#416b48;line-height:1.35}
+.fridge-add-only{justify-content:flex-end!important}
+.fridge-add-only .fridge-add-toggle{width:100%;max-width:none}
 </style>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -552,6 +556,7 @@ body.fridge-mode .container{max-width:850px!important}
       <input id="nuovoProdottoSpesa" type="text" placeholder="Scrivi o detta: latte, pane, mozzarella">
       <button onclick="aggiungiAllaSpesa()">＋ Aggiungi</button>
     </div>
+    <div class="dictation-hint">Detta il prodotto utilizzando il microfono della tastiera.</div>
 
     
   </div>
@@ -568,10 +573,10 @@ body.fridge-mode .container{max-width:850px!important}
 
 <section id="paginaFrigo" class="page">
   <div class="fridge-toolbar">
-    <div class="fridge-search-row"><label class="fridge-search" aria-label="Cerca un prodotto"><span>⌕</span><input id="cercaFrigo" type="search" placeholder="Cerca un prodotto..." oninput="mostraProdotti()"></label><button class="fridge-add-toggle" onclick="toggleAggiuntaFrigo()">＋ Aggiungi</button></div>
+    <div class="fridge-search-row fridge-add-only"><button class="fridge-add-toggle" onclick="toggleAggiuntaFrigo()">＋ Aggiungi</button></div>
     <div class="fridge-categories" aria-label="Filtra prodotti"><button class="category-chip selected" data-cat="Tutti" onclick="filtraFrigo('Tutti')">Tutti</button><button class="category-chip" data-cat="Frutta" onclick="filtraFrigo('Frutta')">🍎 Frutta</button><button class="category-chip" data-cat="Verdura" onclick="filtraFrigo('Verdura')">🥬 Verdura</button><button class="category-chip" data-cat="Latticini" onclick="filtraFrigo('Latticini')">🧀 Latticini</button><button class="category-chip" data-cat="Carne" onclick="filtraFrigo('Carne')">🥩 Carne</button><button class="category-chip" data-cat="Pesce" onclick="filtraFrigo('Pesce')">🐟 Pesce</button><button class="category-chip" data-cat="Altro" onclick="filtraFrigo('Altro')">🛍️ Altro</button></div>
   </div>
-  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Nome prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="data">Data di scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi prodotto</button></div>
+  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="data">Scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi</button></div>
   <div id="lista" class="fridge-products"></div>
 </section>
 
@@ -956,39 +961,28 @@ function aggiungiProdottoSalvato(nome, giorni) {
 function aggiungiProdottoManuale() {
   const nome = document.getElementById("nome").value.trim();
   const data = document.getElementById("data").value;
+  const box=document.getElementById('aggiuntaFrigo');
 
+  if (!nome && !data) {
+    box.classList.add('hidden');
+    return;
+  }
   if (!nome || !data) {
-    alert("Inserisci il nome del prodotto e la data di scadenza.");
+    alert("Inserisci prodotto e scadenza.");
     return;
   }
 
-  prodotti.push({
-    id: Date.now(),
-    nome: nome,
-    data: data,
-    quantita: 1
-  });
-
+  prodotti.push({ id: Date.now(), nome, data, quantita: 1 });
   salvaProdotti();
   if (!window.VERSIONE_PROVA_LOCALE) sincronizzaScadenze();
 
+  if (!trovaProdottoSalvato(nome)) aggiungiProdottoSalvato(nome, durataIndicativa(nome));
+
   document.getElementById("nome").value = "";
   document.getElementById("data").value = "";
-
-  if (!trovaProdottoSalvato(nome)) {
-    const salva = confirm('Vuoi aggiungere "' + nome + '" alla LISTA PRODOTTI SALVATI?');
-    if (salva) {
-      const risposta = prompt('Quanti giorni di scadenza vuoi assegnargli?');
-      if (risposta !== null && risposta.trim() !== '') {
-        const giorni = Number(risposta);
-        if (Number.isInteger(giorni) && giorni >= 0) aggiungiProdottoSalvato(nome, giorni);
-        else alert('Inserisci un numero di giorni valido.');
-      }
-    }
-  }
   mostraProdotti();
   if (!window.VERSIONE_PROVA_LOCALE) controllaNotifiche();
-  document.getElementById('aggiuntaFrigo').classList.add('hidden');
+  box.classList.add('hidden');
 }
 
 function aggiungiSalvatoDirettamenteAlFrigo(id) {
@@ -1051,7 +1045,7 @@ function infoAlimento(nome){
 function mostraProdotti() {
   const lista=document.getElementById('lista');
   if(!lista) return;
-  const ricerca=(document.getElementById('cercaFrigo')?.value||'').trim().toLocaleLowerCase('it-IT');
+  const ricerca='';
   const visibili=[...prodotti].filter(p=>{
     const info=infoAlimento(p.nome);
     return (categoriaFrigo==='Tutti'||categoriaFrigo===info.categoria)&&p.nome.toLocaleLowerCase('it-IT').includes(ricerca);
@@ -1303,7 +1297,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.5.2';
+    const versioneCorrente='2.5.3';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1311,9 +1305,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=252')){
+      if(!location.search.includes('appv=253')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','252');
+        u.searchParams.set('appv','253');
         location.replace(u.toString());
       }
     }
@@ -1329,6 +1323,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.2</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.3</div>
 </body>
 </html>
