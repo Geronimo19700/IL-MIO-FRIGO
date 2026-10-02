@@ -803,7 +803,7 @@ function salvaDepositi(){ localStorage.setItem(CHIAVE_FREEZER,JSON.stringify(pro
 function destinazioneProdotto(nome){
  const n=String(nome||"").toLocaleLowerCase("it-IT");
  if(/surgelat|congelat|gelato|ghiacciolo|pizza/.test(n)) return "freezer";
- if(/latte|yogurt|mozzarella|ricotta|uova|affettato|prosciutto|salame|wurstel|würstel|pasta fresca|insalata|frutta|verdura fresca|carne fresca|pesce fresco/.test(n)) return "frigo";
+ if(/latte|yogurt|mozzarella|ricotta|uova|affettato|prosciutto|salame|wurstel|würstel|pasta fresca|insalata|frutta|verdura fresca|carne fresca|pesce/.test(n)) return "frigo";
  return "dispensa";
 }
 function mostraFreezer(){ const b=document.getElementById("listaFreezer"); b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>'<div class="storage-item"><span>❄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">Il Freezer è vuoto.</div>'; }
@@ -942,7 +942,6 @@ async function trasferisciTuttoInFrigo() {
     }
   }
   salvaDepositi(); archiviaListaAttiva(); listaSpesa=[]; preparaNuovaLista(); salvaListaSpesa(); mostraListaSpesa();
-  alert("Spesa sistemata tra Frigo, Freezer e Dispensa.");
 }
 
 function durataIndicativa(nome){
@@ -1269,7 +1268,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.7.0';
+    const versioneCorrente='2.7.1';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1277,9 +1276,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=270')){
+      if(!location.search.includes('appv=271')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','270');
+        u.searchParams.set('appv','271');
         location.replace(u.toString());
       }
     }
@@ -1295,6 +1294,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.0</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.7.1</div>
 </body>
 </html>
