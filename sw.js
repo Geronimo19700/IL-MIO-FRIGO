@@ -42,7 +42,7 @@ self.addEventListener("notificationclick", event => {
 
       if (clients.openWindow) {
         return clients.openWindow(
-          "https://geronimo19700.github.io/Scadenze-alimentari/"
+          "https://geronimo19700.github.io/IL-MIO-FRIGO/"
         );
       }
     })
