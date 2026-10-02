@@ -524,12 +524,18 @@ body.fridge-mode .container{max-width:850px!important}
  .fridge-qty{grid-column:2;justify-self:start;margin-top:2px}
  .fridge-direct-actions{grid-column:3;grid-row:2;justify-self:end}
 }
+
+.top-nav{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.top-nav .nav-coming{display:flex!important;position:relative;flex-direction:column;align-items:center;justify-content:center;gap:2px;aspect-ratio:514/316!important;border-radius:24px!important;color:white!important;text-shadow:0 2px 4px rgba(0,0,0,.28);font-size:clamp(17px,4.7vw,27px)!important;overflow:hidden}
+.top-nav .nav-freezer{background:linear-gradient(145deg,#d9f7ff 0%,#58c7ef 45%,#1689ce 100%)!important;box-shadow:inset 0 0 22px rgba(255,255,255,.8),0 5px 12px rgba(24,120,170,.2)!important}
+.top-nav .nav-dispensa{background:linear-gradient(145deg,#e2ad61 0%,#a76525 52%,#744018 100%)!important;box-shadow:inset 0 0 20px rgba(255,225,166,.45),0 5px 12px rgba(99,57,22,.2)!important}
+.nav-new-icon{position:absolute;top:12px;right:14px;font-size:28px}.nav-new-art{font-size:clamp(45px,14vw,86px);line-height:.9}.nav-coming strong{position:relative;margin-top:8px}
 </style>
 <style id="illustrazioni-alimenti">.food-illustration{overflow:hidden!important}.product-picture{display:block;width:100%;height:100%;object-fit:contain;border-radius:12px}.library-category-icon{overflow:hidden}.library-category-icon .product-picture{width:100%;height:100%}.product-picture-fallback{font-size:inherit;line-height:1}</style></head>
 
 <body>
 
-<nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button></nav>
+<nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button><button class="nav-freezer nav-coming" onclick="sezioneInLavorazione('Freezer')" aria-label="Freezer"><span class="nav-new-icon">❄️</span><span class="nav-new-art">🧊</span><strong>Freezer</strong></button><button class="nav-dispensa nav-coming" onclick="sezioneInLavorazione('Dispensa')" aria-label="Dispensa"><span class="nav-new-icon">🏺</span><span class="nav-new-art">🗄️</span><strong>Dispensa</strong></button></nav>
 
 <header id="headerSpesa" class="header-spesa">
   
@@ -590,7 +596,7 @@ body.fridge-mode .container{max-width:850px!important}
   <h3>📚 Richiama una vecchia lista</h3>
   <p class="archive-help">Le liste vengono conservate su questo dispositivo. Se ne richiami una, puoi modificarla e poi tornare a crearne una nuova.</p>
   <div id="archivioListeElenco" class="archive-list"></div>
-  <div class="archive-footer"><button type="button" class="archive-new" onclick="creaNuovaListaDaGestione()">＋ Crea una nuova lista</button><button type="button" class="archive-delete" id="eliminaListaRichiamata" onclick="eliminaListaAttualeDaGestione()">🗑 Elimina la lista richiamata</button></div>
+  <div class="archive-footer"><button type="button" class="archive-new" onclick="creaNuovaListaDaGestione()">＋ Crea una nuova lista</button></div>
  </div>
 </div>
 <script>
@@ -763,6 +769,8 @@ function eliminaListaAttualeDaGestione() {
   localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
   salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
 }
+
+function sezioneInLavorazione(nome) { alert(nome + ": in lavorazione"); }
 
 function mostraPagina(pagina) {
   const spesa = pagina === "spesa";
@@ -1235,7 +1243,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.5.4';
+    const versioneCorrente='2.6.0';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1243,9 +1251,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=254')){
+      if(!location.search.includes('appv=260')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','254');
+        u.searchParams.set('appv','260');
         location.replace(u.toString());
       }
     }
@@ -1261,6 +1269,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.4</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.6.0</div>
 </body>
 </html>
