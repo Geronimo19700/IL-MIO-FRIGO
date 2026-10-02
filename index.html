@@ -1176,69 +1176,7 @@ function selezionaSalvato(id) {
   }
 }
 
-function modificaProdottoSalvato(id) {
-  const p = prodottiSalvati.find(x => x.id === id);
-  if (!p) return;
-
-  const nuovoNome = prompt("Nome prodotto:", p.nome);
-  if (nuovoNome === null || !nuovoNome.trim()) return;
-
-  const nuoviGiorni = prompt("Giorni di scadenza:", p.giorni);
-  if (nuoviGiorni === null) return;
-
-  const giorni = parseInt(nuoviGiorni, 10);
-  if (!Number.isFinite(giorni) || giorni < 0) {
-    alert("Numero di giorni non valido.");
-    return;
-  }
-
-  p.nome = nuovoNome.trim().toUpperCase();
-  p.giorni = giorni;
-
-  salvaProdottiSalvati();
-  mostraListaSalvati();
-}
-
-function eliminaProdottoSalvato(id) {
-  const p = prodottiSalvati.find(x => x.id === id);
-  if (!p) return;
-
-  if (!confirm('Eliminare "' + p.nome + '" dalla LISTA PRODOTTI SALVATI?')) return;
-
-  prodottiSalvati = prodottiSalvati.filter(x => x.id !== id);
-  salvaProdottiSalvati();
-  mostraListaSalvati();
-}
-
-function aggiungiNuovoSalvato() {
-  const nome = prompt("Nome del nuovo prodotto:");
-  if (!nome || !nome.trim()) return;
-
-  const giorniInput = prompt("Tra quanti giorni scade?");
-  if (giorniInput === null) return;
-
-  const giorni = parseInt(giorniInput, 10);
-
-  if (!Number.isFinite(giorni) || giorni < 0) {
-    alert("Numero di giorni non valido.");
-    return;
-  }
-
-  if (trovaProdottoSalvato(nome)) {
-    alert("Questo prodotto è già presente nella lista.");
-    return;
-  }
-
-  prodottiSalvati.push({
-    id: "salvato_" + Date.now(),
-    nome: nome.trim().toUpperCase(),
-    giorni: giorni
-  });
-
-  salvaProdottiSalvati();
-  mostraListaSalvati();
-}
-
+/* Archivio durate interno: nessuna gestione o domanda visibile all'utente. */
 function escapeHtml(testo) {
   const div = document.createElement("div");
   div.textContent = testo;
@@ -1297,7 +1235,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.5.3';
+    const versioneCorrente='2.5.4';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1305,9 +1243,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=253')){
+      if(!location.search.includes('appv=254')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','253');
+        u.searchParams.set('appv','254');
         location.replace(u.toString());
       }
     }
@@ -1323,6 +1261,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.3</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.5.4</div>
 </body>
 </html>
