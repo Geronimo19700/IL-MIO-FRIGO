@@ -546,6 +546,14 @@ body.fridge-mode .container{max-width:850px!important}
 .onesignal-bell-container,.onesignal-bell-launcher,.onesignal-slidedown-container,
 [class*="onesignal-bell"],[id*="onesignal-bell"],[class*="onesignal-slidedown"],[id*="onesignal-slidedown"]{display:none!important;visibility:hidden!important;width:0!important;height:0!important;overflow:hidden!important}
 .top-nav .nav-freezer,.top-nav .nav-dispensa{background-size:contain!important;background-position:center center!important;background-repeat:no-repeat!important;background-origin:content-box!important}
+</style><style id="nav-clean-281">
+.top-nav .nav-freezer,.top-nav .nav-dispensa{
+  background-color:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+  outline:0!important;
+}
+.top-nav .nav-freezer.active,.top-nav .nav-dispensa.active{box-shadow:none!important;outline:0!important}
 </style></head>
 
 <body class="notranslate" translate="no">
@@ -817,7 +825,7 @@ function salvaDepositi(){ localStorage.setItem(CHIAVE_FREEZER,JSON.stringify(pro
 function destinazioneProdotto(nome){
  const n=testoProdottoNormalizzato(nome);
  if(/surgelat|congelat|frozen|congelad|helado|ghiacciolo|ice cream|pizza/.test(n)) return "freezer";
- if(/latte|leche|milk|yogurt|yoghurt|mozzarella|ricotta|uova|huevo|egg|affettato|prosciutto|jamon|ham|salame|salami|wurstel|pasta fresca|insalata|ensalada|salad|frutta|fruta|fruit|verdura fresca|vegetal|vegetable|carne|meat|pesce|pescado|fish/.test(n)) return "frigo";
+ if(/latte|leche|milk|yogurt|yoghurt|mozzarella|ricotta|uova|huevo|egg|affettato|prosciutto|jamon|ham|salame|salami|wurstel|pasta fresca|insalata|ensalada|salad|frutta|fruta|fruit|verdura|vegetal|vegetable|carne|meat|pollo|chicken|tacchino|pavo|turkey|manzo|beef|vitello|veal|maiale|cerdo|pork|bistecca|steak|hamburger|pesce|pescado|fish|salmone|salmon|tonno|atun|tuna|merluzzo|bacalao|cod|gamber|camaron|shrimp/.test(n)) return "frigo";
  return "dispensa";
 }
 function mostraFreezer(){ const b=document.getElementById("listaFreezer"); b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>'<div class="storage-item"><span>❄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">Il Freezer è vuoto.</div>'; }
@@ -1282,7 +1290,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.8.0';
+    const versioneCorrente='2.8.1';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1290,9 +1298,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=280')){
+      if(!location.search.includes('appv=281')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','280');
+        u.searchParams.set('appv','281');
         location.replace(u.toString());
       }
     }
@@ -1308,6 +1316,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.8.0</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.8.1</div>
 </body>
 </html>
