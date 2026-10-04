@@ -554,7 +554,26 @@ body.fridge-mode .container{max-width:850px!important}
   outline:0!important;
 }
 .top-nav .nav-freezer.active,.top-nav .nav-dispensa.active{box-shadow:none!important;outline:0!important}
-</style></head>
+</style><style id="sposta-prodotti">
+.storage-item{grid-template-columns:42px minmax(0,1fr) auto!important}
+.storage-icon{font-size:24px;text-align:center}
+.storage-item-side{display:flex;align-items:center;justify-content:flex-end;gap:7px;flex-wrap:wrap}
+.storage-qty{font-weight:800;min-width:25px;text-align:center}
+.storage-move-btn,.fridge-move-btn{background:#1976d2!important;color:#fff!important;border:0!important;font-weight:800!important}
+.storage-move-btn{padding:8px 10px!important;font-size:13px!important;border-radius:9px!important}
+.storage-delete-btn{display:flex;align-items:center;justify-content:center;width:35px!important;height:35px!important;min-width:35px;padding:0!important;border-radius:10px!important;background:#df3f48!important;color:#fff!important;font-size:27px!important;line-height:1!important}
+.fridge-product{grid-template-columns:74px minmax(0,1fr) 91px 59px!important}
+.fridge-move-btn{width:57px!important;min-width:57px!important;height:31px!important;font-size:11px!important;border-radius:9px!important}
+.move-modal-box{max-width:430px!important;text-align:center;overflow:visible!important}
+.move-product-name{margin:10px 0 16px;font-size:19px;font-weight:900;color:#314357}
+.move-destinations{display:grid;grid-template-columns:1fr;gap:10px}
+.move-destinations button{width:100%;padding:14px 12px;font-size:17px}
+.move-destinations button:disabled{opacity:.38;cursor:not-allowed}
+.move-frigo{background:#c62828!important}.move-freezer{background:#1689b8!important}.move-dispensa{background:#a46327!important}
+@media(max-width:420px){.fridge-product{grid-template-columns:55px minmax(0,1fr) 77px 49px!important}.fridge-move-btn{width:47px!important;min-width:47px!important;font-size:9px!important}.storage-item{grid-template-columns:34px minmax(0,1fr) auto!important;gap:7px!important;padding-left:2px!important;padding-right:2px!important}.storage-item-side{gap:5px}.storage-move-btn{padding:7px 8px!important;font-size:12px!important}}
+@media(max-width:355px){.fridge-product{grid-template-columns:43px minmax(0,1fr) 67px 43px!important}.fridge-move-btn{width:41px!important;min-width:41px!important;font-size:8px!important}.storage-move-btn{padding:7px 6px!important;font-size:11px!important}}
+</style>
+</head>
 
 <body class="notranslate" translate="no">
 
@@ -619,6 +638,21 @@ body.fridge-mode .container{max-width:850px!important}
   <div class="card"><h2>🗄️ Prodotti in Dispensa</h2><div id="listaDispensa"></div></div>
 </section>
 </main>
+
+<div id="modalSpostamento" class="modal" onclick="chiudiSpostamentoSeFuori(event)">
+  <div class="modal-box move-modal-box" role="dialog" aria-modal="true" aria-labelledby="titoloSpostamento">
+    <div class="modal-head">
+      <h2 id="titoloSpostamento">Sposta prodotto</h2>
+      <button class="close" onclick="chiudiSpostaProdotto()" aria-label="Chiudi">Chiudi</button>
+    </div>
+    <div id="nomeProdottoSpostamento" class="move-product-name"></div>
+    <div class="move-destinations">
+      <button class="move-frigo" data-destinazione="frigo" onclick="spostaProdotto('frigo')">🧊 Frigo</button>
+      <button class="move-freezer" data-destinazione="freezer" onclick="spostaProdotto('freezer')">❄️ Freezer</button>
+      <button class="move-dispensa" data-destinazione="dispensa" onclick="spostaProdotto('dispensa')">🗄️ Dispensa</button>
+    </div>
+  </div>
+</div>
 
 <div id="gestioneListe" class="archive-backdrop" role="dialog" aria-modal="true" aria-labelledby="titoloGestioneListe" onclick="if(event.target===this)chiudiGestioneListe()">
  <div class="archive-panel">
@@ -828,8 +862,84 @@ function destinazioneProdotto(nome){
  if(/latte|leche|milk|yogurt|yoghurt|mozzarella|ricotta|uova|huevo|egg|affettato|prosciutto|jamon|ham|salame|salami|wurstel|pasta fresca|insalata|ensalada|salad|frutta|fruta|fruit|verdura|vegetal|vegetable|carne|meat|pollo|chicken|tacchino|pavo|turkey|manzo|beef|vitello|veal|maiale|cerdo|pork|bistecca|steak|hamburger|pesce|pescado|fish|salmone|salmon|tonno|atun|tuna|merluzzo|bacalao|cod|gamber|camaron|shrimp/.test(n)) return "frigo";
  return "dispensa";
 }
-function mostraFreezer(){ const b=document.getElementById("listaFreezer"); b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>'<div class="storage-item"><span>❄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">Il Freezer è vuoto.</div>'; }
-function mostraDispensa(){ const b=document.getElementById("listaDispensa"); b.innerHTML=prodottiDispensa.length?prodottiDispensa.map(p=>'<div class="storage-item"><span>🗄️</span><strong>'+escapeHtml(p.nome)+'</strong><span>x'+(p.quantita||1)+'</span></div>').join(""):'<div class="vuoto">La Dispensa è vuota.</div>'; }
+function rigaDeposito(origine,p,icona){
+  return `<div class="storage-item"><span class="storage-icon">${icona}</span><strong>${escapeHtml(p.nome)}</strong><div class="storage-item-side"><span class="storage-qty">x${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button class="storage-move-btn" onclick='apriSpostaProdotto("${origine}",${JSON.stringify(p.id)})' aria-label="Sposta ${escapeHtml(p.nome)}">Sposta</button><button class="storage-delete-btn" onclick='eliminaDaDeposito("${origine}",${JSON.stringify(p.id)})' aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></div>`;
+}
+function mostraFreezer(){
+  const b=document.getElementById("listaFreezer");
+  if(!b)return;
+  b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>rigaDeposito("freezer",p,"❄️")).join(""):'<div class="vuoto">Il Freezer è vuoto.</div>';
+}
+function mostraDispensa(){
+  const b=document.getElementById("listaDispensa");
+  if(!b)return;
+  b.innerHTML=prodottiDispensa.length?prodottiDispensa.map(p=>rigaDeposito("dispensa",p,"🗄️")).join(""):'<div class="vuoto">La Dispensa è vuota.</div>';
+}
+let origineSpostamento=null;
+let idSpostamento=null;
+function apriSpostaProdotto(origine,id){
+  const sorgente=origine==="frigo"?prodotti:origine==="freezer"?prodottiFreezer:prodottiDispensa;
+  const p=sorgente.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  origineSpostamento=origine;
+  idSpostamento=id;
+  const nome=document.getElementById("nomeProdottoSpostamento");
+  if(nome)nome.textContent=p.nome;
+  document.querySelectorAll("#modalSpostamento [data-destinazione]").forEach(btn=>btn.disabled=btn.dataset.destinazione===origine);
+  document.getElementById("modalSpostamento").classList.add("open");
+}
+function chiudiSpostaProdotto(){
+  const modal=document.getElementById("modalSpostamento");
+  if(modal)modal.classList.remove("open");
+  origineSpostamento=null;
+  idSpostamento=null;
+}
+function chiudiSpostamentoSeFuori(event){if(event.target.id==="modalSpostamento")chiudiSpostaProdotto();}
+function eliminaDaDeposito(origine,id){
+  if(origine==="freezer")prodottiFreezer=prodottiFreezer.filter(p=>String(p.id)!==String(id));
+  else prodottiDispensa=prodottiDispensa.filter(p=>String(p.id)!==String(id));
+  salvaDepositi();
+  mostraFreezer();
+  mostraDispensa();
+}
+function spostaProdotto(destinazione){
+  if(!origineSpostamento||idSpostamento===null)return;
+  if(destinazione===origineSpostamento){chiudiSpostaProdotto();return;}
+  let item=null;
+  if(origineSpostamento==="frigo"){
+    item=prodotti.find(p=>String(p.id)===String(idSpostamento));
+    prodotti=prodotti.filter(p=>String(p.id)!==String(idSpostamento));
+  }else if(origineSpostamento==="freezer"){
+    item=prodottiFreezer.find(p=>String(p.id)===String(idSpostamento));
+    prodottiFreezer=prodottiFreezer.filter(p=>String(p.id)!==String(idSpostamento));
+  }else{
+    item=prodottiDispensa.find(p=>String(p.id)===String(idSpostamento));
+    prodottiDispensa=prodottiDispensa.filter(p=>String(p.id)!==String(idSpostamento));
+  }
+  if(!item){chiudiSpostaProdotto();return;}
+  const quantita=Math.max(1,Math.min(10,Number(item.quantita)||1));
+  if(destinazione==="frigo"){
+    let data=item.data;
+    if(!data){
+      const salvato=trovaProdottoSalvato(item.nome);
+      let giorni=salvato?Number(salvato.giorni):durataIndicativa(item.nome);
+      if(!Number.isFinite(giorni)||giorni<0)giorni=7;
+      const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()+giorni);
+      data=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    }
+    prodotti.push({id:item.id||Date.now()+Math.random(),nome:item.nome,quantita,data});
+  }else{
+    const copia={id:item.id||Date.now()+Math.random(),nome:item.nome,quantita};
+    if(item.data)copia.data=item.data;
+    if(destinazione==="freezer")prodottiFreezer.push(copia);
+    else prodottiDispensa.push(copia);
+  }
+  salvaProdotti();
+  salvaDepositi();
+  if(!window.VERSIONE_PROVA_LOCALE)sincronizzaScadenze();
+  mostraProdotti();mostraFreezer();mostraDispensa();
+  chiudiSpostaProdotto();
+}
 
 function aggiungiAllaSpesa() {
   const input = document.getElementById("nuovoProdottoSpesa");
@@ -1111,7 +1221,7 @@ function mostraProdotti() {
     const stato=giorni<=0?'danger':giorni<=3?'warning':'good';
     const testo=giorni<0?'Scaduto':giorni===0?'Oggi':giorni===1?'1 giorno':giorni+' giorni';
     const dataFormattata=p.data.split('-').reverse().join('/');
-    return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${immagineProdotto(p.nome)}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span></div><div class="food-expiry"><div class="days-badge">${testo}</div><span>Scade il<br><strong>${dataFormattata}</strong></span></div><div class="quantity-control fridge-qty" aria-label="Quantità"><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},-1)" ${((p.quantita||1)<=1)?'disabled':''}>−</button><span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},1)" ${((p.quantita||1)>=10)?'disabled':''}>＋</button></div><div class="fridge-direct-actions"><button class="fridge-edit-btn" onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})" title="Modifica scadenza" aria-label="Modifica la scadenza di ${escapeHtml(p.nome)}">✏️</button><button class="fridge-remove-btn" onclick="eliminaProdotto(${JSON.stringify(p.id)})" title="Elimina prodotto" aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></article>`;
+    return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${immagineProdotto(p.nome)}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span></div><div class="food-expiry"><div class="days-badge">${testo}</div><span>Scade il<br><strong>${dataFormattata}</strong></span></div><div class="quantity-control fridge-qty" aria-label="Quantità"><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},-1)" ${((p.quantita||1)<=1)?'disabled':''}>−</button><span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},1)" ${((p.quantita||1)>=10)?'disabled':''}>＋</button></div><div class="fridge-direct-actions"><button class="fridge-move-btn" onclick="apriSpostaProdotto('frigo',${JSON.stringify(p.id)})" title="Sposta prodotto" aria-label="Sposta ${escapeHtml(p.nome)}">Sposta</button><button class="fridge-edit-btn" onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})" title="Modifica scadenza" aria-label="Modifica la scadenza di ${escapeHtml(p.nome)}">✏️</button><button class="fridge-remove-btn" onclick="eliminaProdotto(${JSON.stringify(p.id)})" title="Elimina prodotto" aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></article>`;
   }).join('');
 }
 function toggleAzioniProdotto(btn){
@@ -1290,7 +1400,7 @@ mostraProdotti();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.8.1';
+    const versioneCorrente='2.9.0';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1298,9 +1408,9 @@ mostraProdotti();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=281')){
+      if(!location.search.includes('appv=290')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','281');
+        u.searchParams.set('appv','290');
         location.replace(u.toString());
       }
     }
@@ -1316,6 +1426,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.8.1</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.9.0</div>
 </body>
 </html>
