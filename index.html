@@ -1464,9 +1464,12 @@ async function sincronizzaScadenze() {
 }
 
 
+migraScadenzeDepositi();
 aggiornaNomeLista();
 mostraListaSpesa();
 mostraProdotti();
+mostraFreezer();
+mostraDispensa();
 
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
