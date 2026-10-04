@@ -340,6 +340,22 @@ button:active { transform: scale(.99); }
 .dictation-hint{margin-top:10px;padding:10px 12px 4px;font-size:14px;font-weight:700;color:#416b48;line-height:1.35}
 .fridge-add-only{justify-content:flex-end!important}
 .fridge-add-only .fridge-add-toggle{width:100%;max-width:none}
+
+/* v2.9.1: Freezer e Dispensa uniformati ai pulsanti principali */
+.storage-nav .storage-card, .deposit-nav .deposit-card,
+.freezer-card, .dispensa-card, [data-page="freezer"], [data-page="dispensa"]{
+  border-radius:28px!important;
+  overflow:hidden!important;
+}
+.storage-nav .freezer-card, .freezer-card, [data-page="freezer"]{
+  border:4px solid #45aeea!important;
+  box-shadow:0 4px 12px rgba(48,153,214,.18)!important;
+}
+.storage-nav .dispensa-card, .dispensa-card, [data-page="dispensa"]{
+  border:4px solid #e69a20!important;
+  box-shadow:0 4px 12px rgba(214,139,22,.18)!important;
+}
+.temp-storage-warning{max-width:714px;margin:10px auto 4px;padding:11px 14px;border:2px solid #e4a126;border-radius:16px;background:#fff7df;color:#704d00;font-size:13px;font-weight:800;line-height:1.35;text-align:center}
 </style>
 
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
@@ -602,6 +618,7 @@ body.fridge-mode .container{max-width:850px!important}
 <body class="notranslate" translate="no">
 
 <nav class="top-nav" aria-label="Navigazione principale"><button id="navSpesa" class="nav-spesa active" onclick="mostraPagina('spesa')" aria-label="Lista spesa"><span class="sr-only">Lista spesa</span></button><button id="navFrigo" class="nav-frigo" onclick="mostraPagina('frigo')" aria-label="Il mio frigo"><span class="sr-only">Il mio frigo</span></button><button id="navFreezer" class="nav-freezer nav-coming" onclick="mostraPagina('freezer')" aria-label="Freezer"></button><button id="navDispensa" class="nav-dispensa nav-coming" onclick="mostraPagina('dispensa')" aria-label="Dispensa"></button></nav>
+<div class="temp-storage-warning">⚠️ Attenzione: non cancellare o reinstallare l’app. Finché il salvataggio online non sarà attivo, potresti perdere i prodotti salvati sul telefono.</div>
 
 <header id="headerSpesa" class="header-spesa">
   
@@ -1474,7 +1491,7 @@ mostraDispensa();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.9.0';
+    const versioneCorrente='2.9.1';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1482,9 +1499,9 @@ mostraDispensa();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=290')){
+      if(!location.search.includes('appv=291')){
         const u=new URL(location.href);
-        u.searchParams.set('appv','290');
+        u.searchParams.set('appv','291');
         location.replace(u.toString());
       }
     }
@@ -1500,6 +1517,6 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.9.0</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.9.1</div>
 </body>
 </html>
