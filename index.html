@@ -573,7 +573,31 @@ body.fridge-mode .container{max-width:850px!important}
 @media(max-width:420px){.fridge-product{grid-template-columns:55px minmax(0,1fr) 77px 49px!important}.fridge-move-btn{width:47px!important;min-width:47px!important;font-size:9px!important}.storage-item{grid-template-columns:34px minmax(0,1fr) auto!important;gap:7px!important;padding-left:2px!important;padding-right:2px!important}.storage-item-side{gap:5px}.storage-move-btn{padding:7px 8px!important;font-size:12px!important}}
 @media(max-width:355px){.fridge-product{grid-template-columns:43px minmax(0,1fr) 67px 43px!important}.fridge-move-btn{width:41px!important;min-width:41px!important;font-size:8px!important}.storage-move-btn{padding:7px 6px!important;font-size:11px!important}}
 </style>
-</head>
+<style id="depositi-scadenze-v290">
+/* quattro tessere di navigazione con la stessa cornice */
+.top-nav button{border-radius:24px!important;overflow:hidden!important;border:2px solid rgba(255,255,255,.92)!important;box-shadow:0 5px 14px rgba(40,70,70,.16)!important}
+.top-nav .nav-freezer,.top-nav .nav-dispensa{outline:0!important}
+.fridge-categories{display:none!important}
+#headerFrigo .hero-title{color:#b4232c!important}
+.storage-add-toggle{width:100%;margin:0 0 14px;background:#277de0!important;border-radius:18px!important}
+.storage-add-card button{width:100%}
+.storage-products{display:grid;gap:12px}
+.storage-product{grid-template-columns:42px minmax(0,1fr) auto!important;border:0!important;border-radius:20px!important;background:#fff;padding:13px!important;box-shadow:0 4px 12px rgba(60,90,110,.10)}
+.storage-main{min-width:0}.storage-main>strong{font-size:17px}.storage-expiry{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:7px}.storage-expiry small{color:#65798f}
+.storage-item-side{display:flex!important;flex-direction:column;align-items:flex-end;gap:7px}.storage-actions,.fridge-direct-actions{display:flex!important;flex-direction:row!important;align-items:center;justify-content:flex-end;gap:5px!important}
+.storage-actions button,.fridge-direct-actions button{width:auto!important;min-width:30px!important;height:32px!important;padding:4px 7px!important;font-size:12px!important;border-radius:9px!important}
+.fridge-product{grid-template-columns:74px minmax(0,1fr) minmax(125px,180px)!important}
+.fridge-product .food-expiry{text-align:right}.fridge-product .food-expiry>span{margin-bottom:6px}
+.fridge-product.urgent .days-badge,.storage-product.urgent .days-badge{background:#d71920!important;color:#fff!important}
+.fridge-product.expired,.storage-product.expired{background:#ffd9dc!important;border:2px solid #df2832!important;box-shadow:0 5px 16px rgba(190,25,35,.22)!important}
+.fridge-product.expired .days-badge,.storage-product.expired .days-badge{background:#b9000c!important;color:#fff!important}
+@media(max-width:520px){
+ .fridge-product{grid-template-columns:58px minmax(0,1fr)!important}
+ .fridge-product .food-expiry{grid-column:1/-1;text-align:left;display:grid;grid-template-columns:minmax(110px,1fr) auto;gap:7px;align-items:center}
+ .fridge-product .food-expiry>span{margin:0}.fridge-direct-actions{grid-column:1/-1!important}
+ .storage-product{grid-template-columns:34px minmax(0,1fr)!important}.storage-item-side{grid-column:2;align-items:flex-start}
+}
+</style></head>
 
 <body class="notranslate" translate="no">
 
@@ -584,7 +608,7 @@ body.fridge-mode .container{max-width:850px!important}
 </header>
 
 <header id="headerFrigo" class="header-frigo hidden">
-  <h1 class="hero-title"><span class="expiry-title-icon" aria-hidden="true">🗓️</span><span>I miei prodotti<br class="mobile-title-break"> in scadenza</span></h1>
+  <h1 class="hero-title"><span class="expiry-title-icon" aria-hidden="true">🗓️</span><span>ATTENZIONE AI PRODOTTI IN SCADENZA</span></h1>
 </header>
 
 <main class="container">
@@ -622,20 +646,23 @@ body.fridge-mode .container{max-width:850px!important}
 <section id="paginaFrigo" class="page">
   <div class="fridge-toolbar">
     <div class="fridge-search-row fridge-add-only"><button class="fridge-add-toggle" onclick="toggleAggiuntaFrigo()">＋ Aggiungi</button></div>
-    <div class="fridge-categories" aria-label="Filtra prodotti"><button class="category-chip selected" data-cat="Tutti" onclick="filtraFrigo('Tutti')">Tutti</button><button class="category-chip" data-cat="Frutta" onclick="filtraFrigo('Frutta')">🍎 Frutta</button><button class="category-chip" data-cat="Verdura" onclick="filtraFrigo('Verdura')">🥬 Verdura</button><button class="category-chip" data-cat="Latticini" onclick="filtraFrigo('Latticini')">🧀 Latticini</button><button class="category-chip" data-cat="Carne" onclick="filtraFrigo('Carne')">🥩 Carne</button><button class="category-chip" data-cat="Pesce" onclick="filtraFrigo('Pesce')">🐟 Pesce</button><button class="category-chip" data-cat="Altro" onclick="filtraFrigo('Altro')">🛍️ Altro</button></div>
   </div>
-  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="data">Scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi</button></div>
+  <div class="card fridge-add-card hidden" id="aggiuntaFrigo"><h2>＋ Aggiungi prodotto al frigo</h2><label for="nome">Prodotto</label><input id="nome" type="text" placeholder="Es. Latte"><label for="quantitaFrigoManuale">Quantità</label><input id="quantitaFrigoManuale" type="number" min="1" max="10" value="1"><label for="data">Scadenza</label><input id="data" type="date"><button class="fridge-add-submit" onclick="aggiungiProdottoManuale()">＋ Aggiungi</button></div>
   <div id="lista" class="fridge-products"></div>
 </section>
 
 
 <section id="paginaFreezer" class="page storage-page">
   <div class="storage-hero freezer-hero"><div class="storage-big-icon">❄️🧊</div><h1>Il mio Freezer</h1><p>Prodotti surgelati e congelati</p></div>
-  <div class="card"><h2>❄️ Prodotti nel Freezer</h2><div id="listaFreezer"></div></div>
+  <button class="storage-add-toggle" onclick="toggleAggiuntaDeposito('freezer')">＋ Aggiungi</button>
+  <div class="card storage-add-card hidden" id="aggiuntaFreezer"><h2>＋ Aggiungi prodotto al Freezer</h2><label>Prodotto</label><input id="nomeFreezer" type="text"><label>Quantità</label><input id="quantitaFreezer" type="number" min="1" max="10" value="1"><label>Scadenza</label><input id="dataFreezer" type="date"><button onclick="aggiungiProdottoDeposito('freezer')">＋ Aggiungi</button></div>
+  <div class="card"><h2>❄️ Prodotti nel Freezer</h2><div id="listaFreezer" class="storage-products"></div></div>
 </section>
 <section id="paginaDispensa" class="page storage-page">
   <div class="storage-hero pantry-hero"><div class="storage-big-icon">🏺🗄️</div><h1>La mia Dispensa</h1><p>Prodotti che non richiedono frigorifero o freezer</p></div>
-  <div class="card"><h2>🗄️ Prodotti in Dispensa</h2><div id="listaDispensa"></div></div>
+  <button class="storage-add-toggle" onclick="toggleAggiuntaDeposito('dispensa')">＋ Aggiungi</button>
+  <div class="card storage-add-card hidden" id="aggiuntaDispensa"><h2>＋ Aggiungi prodotto in Dispensa</h2><label>Prodotto</label><input id="nomeDispensa" type="text"><label>Quantità</label><input id="quantitaDispensa" type="number" min="1" max="10" value="1"><label>Scadenza</label><input id="dataDispensa" type="date"><button onclick="aggiungiProdottoDeposito('dispensa')">＋ Aggiungi</button></div>
+  <div class="card"><h2>🗄️ Prodotti in Dispensa</h2><div id="listaDispensa" class="storage-products"></div></div>
 </section>
 </main>
 
@@ -862,18 +889,66 @@ function destinazioneProdotto(nome){
  if(/latte|leche|milk|yogurt|yoghurt|mozzarella|ricotta|uova|huevo|egg|affettato|prosciutto|jamon|ham|salame|salami|wurstel|pasta fresca|insalata|ensalada|salad|frutta|fruta|fruit|verdura|vegetal|vegetable|carne|meat|pollo|chicken|tacchino|pavo|turkey|manzo|beef|vitello|veal|maiale|cerdo|pork|bistecca|steak|hamburger|pesce|pescado|fish|salmone|salmon|tonno|atun|tuna|merluzzo|bacalao|cod|gamber|camaron|shrimp/.test(n)) return "frigo";
  return "dispensa";
 }
+function dataDaGiorni(giorni){
+ const d=new Date(); d.setHours(0,0,0,0); d.setDate(d.getDate()+Math.max(0,Number(giorni)||0));
+ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+}
+function durataPerDeposito(nome,origine){
+ const n=testoProdottoNormalizzato(nome);
+ if(origine==="freezer") return 90;
+ if(/pasta|riso|rice|farina|flour|zucchero|sugar|cereali|cereal|biscott|cookie|cracker|scatol|canned|conserv|olio|oil/.test(n)) return 180;
+ return 60;
+}
+function migraScadenzeDepositi(){
+ let cambiato=false;
+ prodottiFreezer.forEach(p=>{if(!p.data){p.data=dataDaGiorni(durataPerDeposito(p.nome,"freezer"));cambiato=true;}});
+ prodottiDispensa.forEach(p=>{if(!p.data){p.data=dataDaGiorni(durataPerDeposito(p.nome,"dispensa"));cambiato=true;}});
+ if(cambiato) salvaDepositi();
+}
+function testoScadenza(giorni){
+ if(giorni<0)return "⚠️ SCADUTO";
+ if(giorni===0)return "⚠️ Scade oggi";
+ if(giorni===1)return "⚠️ 1 giorno — scade domani";
+ return giorni+" giorni";
+}
 function rigaDeposito(origine,p,icona){
-  return `<div class="storage-item"><span class="storage-icon">${icona}</span><strong>${escapeHtml(p.nome)}</strong><div class="storage-item-side"><span class="storage-qty">x${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button class="storage-move-btn" onclick='apriSpostaProdotto("${origine}",${JSON.stringify(p.id)})' aria-label="Sposta ${escapeHtml(p.nome)}">Sposta</button><button class="storage-delete-btn" onclick='eliminaDaDeposito("${origine}",${JSON.stringify(p.id)})' aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></div>`;
+ const giorni=giorniAllaScadenza(p.data);
+ const stato=giorni<0?"expired":giorni<=1?"urgent":giorni<=3?"warning":"good";
+ const dataFormattata=p.data?p.data.split("-").reverse().join("/"):"—";
+ return `<article class="storage-item storage-product ${stato}"><span class="storage-icon">${icona}</span><div class="storage-main"><strong>${escapeHtml(p.nome)}</strong><div class="storage-expiry"><span class="days-badge">${testoScadenza(giorni)}</span><small>Scade il <b>${dataFormattata}</b></small></div></div><div class="storage-item-side"><span class="storage-qty">x${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><div class="storage-actions"><button class="storage-edit-btn" onclick='modificaScadenzaDeposito("${origine}",${JSON.stringify(p.id)})' aria-label="Modifica scadenza">✏️</button><button class="storage-move-btn" onclick='apriSpostaProdotto("${origine}",${JSON.stringify(p.id)})'>Sposta</button><button class="storage-delete-btn" onclick='eliminaDaDeposito("${origine}",${JSON.stringify(p.id)})'>−</button></div></div></article>`;
 }
 function mostraFreezer(){
-  const b=document.getElementById("listaFreezer");
-  if(!b)return;
-  b.innerHTML=prodottiFreezer.length?prodottiFreezer.map(p=>rigaDeposito("freezer",p,"❄️")).join(""):'<div class="vuoto">Il Freezer è vuoto.</div>';
+ const b=document.getElementById("listaFreezer"); if(!b)return;
+ const a=[...prodottiFreezer].sort((x,y)=>(x.data||"").localeCompare(y.data||""));
+ b.innerHTML=a.length?a.map(p=>rigaDeposito("freezer",p,"❄️")).join(""):'<div class="vuoto">Il Freezer è vuoto.</div>';
 }
 function mostraDispensa(){
-  const b=document.getElementById("listaDispensa");
-  if(!b)return;
-  b.innerHTML=prodottiDispensa.length?prodottiDispensa.map(p=>rigaDeposito("dispensa",p,"🗄️")).join(""):'<div class="vuoto">La Dispensa è vuota.</div>';
+ const b=document.getElementById("listaDispensa"); if(!b)return;
+ const a=[...prodottiDispensa].sort((x,y)=>(x.data||"").localeCompare(y.data||""));
+ b.innerHTML=a.length?a.map(p=>rigaDeposito("dispensa",p,"🗄️")).join(""):'<div class="vuoto">La Dispensa è vuota.</div>';
+}
+function toggleAggiuntaDeposito(origine){
+ const id=origine==="freezer"?"aggiuntaFreezer":"aggiuntaDispensa";
+ document.getElementById(id)?.classList.toggle("hidden");
+}
+function aggiungiProdottoDeposito(origine){
+ const suff=origine==="freezer"?"Freezer":"Dispensa";
+ const nome=document.getElementById("nome"+suff).value.trim();
+ const data=document.getElementById("data"+suff).value;
+ const quantita=Math.max(1,Math.min(10,Number(document.getElementById("quantita"+suff).value)||1));
+ if(!nome||!data){alert("Inserisci prodotto e scadenza.");return;}
+ const item={id:Date.now()+Math.random(),nome,data,quantita};
+ if(origine==="freezer")prodottiFreezer.push(item);else prodottiDispensa.push(item);
+ salvaDepositi(); document.getElementById("nome"+suff).value="";document.getElementById("data"+suff).value="";document.getElementById("quantita"+suff).value="1";
+ document.getElementById(origine==="freezer"?"aggiuntaFreezer":"aggiuntaDispensa").classList.add("hidden");
+ mostraFreezer();mostraDispensa();
+}
+function modificaScadenzaDeposito(origine,id){
+ const arr=origine==="freezer"?prodottiFreezer:prodottiDispensa;
+ const p=arr.find(x=>String(x.id)===String(id));if(!p)return;
+ const nuova=prompt("Nuova data di scadenza (AAAA-MM-GG):",p.data||"");if(nuova===null)return;
+ if(!/^\d{4}-\d{2}-\d{2}$/.test(nuova)||Number.isNaN(new Date(nuova+"T00:00:00").getTime())){alert("Inserisci una data valida.");return;}
+ p.data=nuova;salvaDepositi();mostraFreezer();mostraDispensa();
 }
 let origineSpostamento=null;
 let idSpostamento=null;
@@ -1064,8 +1139,8 @@ async function trasferisciTuttoInFrigo() {
   for(const item of [...listaSpesa]){
     const q=Math.max(1,Math.min(10,Number(item.quantita)||1));
     const d=destinazioneProdotto(item.nome);
-    if(d==="freezer") prodottiFreezer.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q});
-    else if(d==="dispensa") prodottiDispensa.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q});
+    if(d==="freezer") prodottiFreezer.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q,data:dataDaGiorni(durataPerDeposito(item.nome,"freezer"))});
+    else if(d==="dispensa") prodottiDispensa.push({id:Date.now()+Math.random(),nome:item.nome,quantita:q,data:dataDaGiorni(durataPerDeposito(item.nome,"dispensa"))});
     else {
       let salvato=trovaProdottoSalvato(item.nome), giorni=salvato?Number(salvato.giorni):durataIndicativa(item.nome);
       if(!Number.isFinite(giorni)||giorni<0) giorni=7;
@@ -1137,7 +1212,8 @@ function aggiungiProdottoManuale() {
     return;
   }
 
-  prodotti.push({ id: Date.now(), nome, data, quantita: 1 });
+  const quantita=Math.max(1,Math.min(10,Number(document.getElementById("quantitaFrigoManuale")?.value)||1));
+  prodotti.push({ id: Date.now(), nome, data, quantita });
   salvaProdotti();
   if (!window.VERSIONE_PROVA_LOCALE) sincronizzaScadenze();
 
@@ -1145,6 +1221,7 @@ function aggiungiProdottoManuale() {
 
   document.getElementById("nome").value = "";
   document.getElementById("data").value = "";
+  if(document.getElementById("quantitaFrigoManuale"))document.getElementById("quantitaFrigoManuale").value="1";
   mostraProdotti();
   if (!window.VERSIONE_PROVA_LOCALE) controllaNotifiche();
   box.classList.add('hidden');
@@ -1208,21 +1285,15 @@ function infoAlimento(nome){
   return match?{categoria:match[0],emoji:match[1]}:{categoria:'Altro',emoji:'🛍️'};
 }
 function mostraProdotti() {
-  const lista=document.getElementById('lista');
-  if(!lista) return;
-  const ricerca='';
-  const visibili=[...prodotti].filter(p=>{
-    const info=infoAlimento(p.nome);
-    return (categoriaFrigo==='Tutti'||categoriaFrigo===info.categoria)&&p.nome.toLocaleLowerCase('it-IT').includes(ricerca);
-  }).sort((a,b)=>a.data.localeCompare(b.data));
-  if(!visibili.length){lista.innerHTML='<div class="fridge-empty">'+(prodotti.length?'Nessun prodotto trovato.':'Il tuo frigo è vuoto. Aggiungi il primo prodotto!')+'</div>';return;}
-  lista.innerHTML=visibili.map(p=>{
-    const info=infoAlimento(p.nome), giorni=giorniAllaScadenza(p.data);
-    const stato=giorni<=0?'danger':giorni<=3?'warning':'good';
-    const testo=giorni<0?'Scaduto':giorni===0?'Oggi':giorni===1?'1 giorno':giorni+' giorni';
-    const dataFormattata=p.data.split('-').reverse().join('/');
-    return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${immagineProdotto(p.nome)}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span></div><div class="food-expiry"><div class="days-badge">${testo}</div><span>Scade il<br><strong>${dataFormattata}</strong></span></div><div class="quantity-control fridge-qty" aria-label="Quantità"><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},-1)" ${((p.quantita||1)<=1)?'disabled':''}>−</button><span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},1)" ${((p.quantita||1)>=10)?'disabled':''}>＋</button></div><div class="fridge-direct-actions"><button class="fridge-move-btn" onclick="apriSpostaProdotto('frigo',${JSON.stringify(p.id)})" title="Sposta prodotto" aria-label="Sposta ${escapeHtml(p.nome)}">Sposta</button><button class="fridge-edit-btn" onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})" title="Modifica scadenza" aria-label="Modifica la scadenza di ${escapeHtml(p.nome)}">✏️</button><button class="fridge-remove-btn" onclick="eliminaProdotto(${JSON.stringify(p.id)})" title="Elimina prodotto" aria-label="Elimina ${escapeHtml(p.nome)}">−</button></div></article>`;
-  }).join('');
+ const lista=document.getElementById("lista");if(!lista)return;
+ const visibili=[...prodotti].sort((a,b)=>(a.data||"").localeCompare(b.data||""));
+ if(!visibili.length){lista.innerHTML='<div class="fridge-empty">Il tuo frigo è vuoto. Aggiungi il primo prodotto!</div>';return;}
+ lista.innerHTML=visibili.map(p=>{
+  const info=infoAlimento(p.nome),giorni=giorniAllaScadenza(p.data);
+  const stato=giorni<0?"expired":giorni<=1?"urgent":giorni<=3?"warning":"good";
+  const dataFormattata=p.data.split("-").reverse().join("/");
+  return `<article class="fridge-product ${stato}"><div class="food-illustration" aria-hidden="true">${immagineProdotto(p.nome)}</div><div class="food-details"><div class="food-name">${escapeHtml(p.nome)}</div><span class="food-category">${info.emoji} ${info.categoria}</span><div class="quantity-control fridge-qty"><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},-1)" ${((p.quantita||1)<=1)?"disabled":""}>−</button><span>${Math.max(1,Math.min(10,Number(p.quantita)||1))}</span><button onclick="cambiaQuantitaFrigo(${JSON.stringify(p.id)},1)" ${((p.quantita||1)>=10)?"disabled":""}>＋</button></div></div><div class="food-expiry"><div class="days-badge">${testoScadenza(giorni)}</div><span>Scade il <strong>${dataFormattata}</strong></span><div class="fridge-direct-actions"><button class="fridge-edit-btn" onclick="modificaScadenzaProdotto(${JSON.stringify(p.id)})">✏️</button><button class="fridge-move-btn" onclick="apriSpostaProdotto('frigo',${JSON.stringify(p.id)})">Sposta</button><button class="fridge-remove-btn" onclick="eliminaProdotto(${JSON.stringify(p.id)})">−</button></div></div></article>`;
+ }).join("");
 }
 function toggleAzioniProdotto(btn){
   const menu=btn.nextElementSibling;
