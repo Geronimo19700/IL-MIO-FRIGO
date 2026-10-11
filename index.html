@@ -620,7 +620,7 @@ body.fridge-mode .container{max-width:850px!important}
 .top-nav .nav-dispensa{border:4px solid #e69a20!important;border-radius:28px!important;overflow:hidden!important;box-shadow:0 4px 12px rgba(214,139,22,.18)!important;background-clip:padding-box!important}
 </style>
 <style id="v292-approved-patch">
-/* v2.9.2: quattro pulsanti con la stessa sagoma/cornice e sfondo interno */
+/* v2.9.3: quattro pulsanti con la stessa sagoma/cornice e sfondo interno */
 .top-nav button{
   border-radius:24px!important;
   overflow:hidden!important;
@@ -1534,7 +1534,7 @@ mostraDispensa();
 // Aggiornamento PWA: forza il recupero dell'HTML nuovo senza cancellare i dati dell'utente.
 (async function aggiornaAppSeNecessario(){
   try{
-    const versioneCorrente='2.9.2';
+    const versioneCorrente='2.9.3';
     const chiave='versioneAppCaricata';
     if(localStorage.getItem(chiave)!==versioneCorrente){
       localStorage.setItem(chiave,versioneCorrente);
@@ -1542,7 +1542,7 @@ mostraDispensa();
         const nomi=await caches.keys();
         await Promise.all(nomi.map(n=>caches.delete(n)));
       }
-      if(!location.search.includes('appv=292')){
+      if(!location.search.includes('appv=293')){
         const u=new URL(location.href);
         u.searchParams.set('appv','292');
         location.replace(u.toString());
@@ -1560,7 +1560,7 @@ if (!window.VERSIONE_PROVA_LOCALE && "serviceWorker" in navigator) {
 }
 </script>
 
-<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.9.2</div>
+<div id="versioneApp" style="position:fixed;right:7px;bottom:5px;font-size:10px;opacity:.42;z-index:2;pointer-events:none">v2.9.3</div>
 
 <script id="v292-warning-timer">
 window.addEventListener('DOMContentLoaded',function(){
