@@ -470,6 +470,7 @@ body.fridge-mode .container{max-width:850px!important}
 .archive-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}.archive-heading h2{font-size:23px;margin:0 0 15px;color:#187545}.archive-close{background:#f0f4f6!important;color:#345!important;width:40px!important;height:40px!important;border-radius:50%!important;padding:0!important}
 .archive-panel label{display:block;font-weight:800;margin:10px 0 7px}.archive-rename{display:flex;gap:8px}.archive-rename input{flex:1;min-width:0;border:2px solid #d3e7d9;border-radius:13px;padding:12px;font-size:16px}.archive-rename button{width:auto!important;background:#33894f!important;border-radius:13px!important;padding:10px 13px!important;white-space:nowrap}
 .archive-panel h3{margin:26px 0 5px;color:#276f4a}.archive-help{font-size:13px;line-height:1.45;color:#617578;margin:0 0 13px}.archive-list{display:grid;gap:9px;max-height:240px;overflow:auto}.archive-item{display:flex;align-items:center;justify-content:space-between;gap:8px;background:#f3faf5;border:1px solid #d5eadb;border-radius:14px;padding:10px}.archive-info{min-width:0;display:grid;gap:3px;overflow-wrap:anywhere}.archive-info small{color:#718078}.archive-item button{width:auto!important;white-space:nowrap;padding:10px!important;background:#6e34a7!important;border-radius:12px!important}.archive-item button:disabled{background:#b5c7bc!important}
+.archive-item .archive-view-button{background:#27874b!important}.archive-view-panel{max-height:90dvh}.archive-view-list{display:grid;gap:8px;max-height:58dvh;overflow:auto;margin-top:14px}.archive-view-item{display:flex;align-items:center;gap:10px;padding:11px 12px;border:1px solid #d5eadb;border-radius:13px;background:#f7fbf8}.archive-view-item .archive-view-emoji{font-size:24px;width:32px;text-align:center}.archive-view-item strong{font-size:16px}.archive-view-empty{padding:18px;border-radius:13px;background:#f5f7f7;color:#617578;text-align:center}
 .archive-footer{display:grid;gap:9px;margin-top:20px}.archive-footer button{width:100%!important;border-radius:14px!important;padding:14px!important}.archive-new{background:#27874b!important}.archive-delete{background:#fff0f0!important;color:#ac3d3d!important;border:1px solid #f3c9c9!important}.archive-delete:disabled{opacity:.45}
 @media(max-width:420px){.archive-panel{padding:15px}.archive-rename{flex-direction:column}.archive-rename button{width:100%!important}}
 </style><style>
@@ -661,7 +662,7 @@ body.fridge-mode .container{max-width:850px!important}
         <div class="lista-name-wrap"><span class="list-name-icon" aria-hidden="true">📝</span><div class="list-name-content"><div class="lista-nome" id="nomeLista">LISTA SPESA — 01/10/2026</div></div></div>
         
       </div>
-      <button class="secondary rename-button" onclick="apriGestioneListe()" aria-label="Modifica nome e richiama liste salvate" title="Modifica o richiama una lista">✏️</button>
+      <button class="secondary rename-button" onclick="apriGestioneListe()" aria-label="Modifica nome e visualizza liste salvate" title="Modifica o visualizza una lista">✏️</button>
     </div>
 
     <div class="add-row">
@@ -726,10 +727,19 @@ body.fridge-mode .container{max-width:850px!important}
   <div class="archive-heading"><h2 id="titoloGestioneListe">📝 Gestisci le tue liste</h2><button type="button" class="archive-close" onclick="chiudiGestioneListe()" aria-label="Chiudi">✕</button></div>
   <label for="nomeListaModifica">Nome della lista attuale</label>
   <div class="archive-rename"><input id="nomeListaModifica" type="text" maxlength="90" placeholder="Nome della lista"><button type="button" onclick="salvaNomeDaGestione()">Salva nome</button></div>
-  <h3>📚 Richiama una vecchia lista</h3>
-  <p class="archive-help">Le liste vengono conservate su questo dispositivo. Se ne richiami una, puoi modificarla e poi tornare a crearne una nuova.</p>
+  <h3>📚 Visualizza le vecchie liste</h3>
+  <p class="archive-help">Le liste vengono conservate su questo dispositivo. Puoi visualizzarle per ricordare cosa avevi comprato, senza caricarle nella lista attuale.</p>
   <div id="archivioListeElenco" class="archive-list"></div>
-  <div class="archive-footer"><button type="button" class="archive-new" onclick="creaNuovaListaDaGestione()">＋ Crea una nuova lista</button></div>
+  <div class="archive-footer"><button type="button" class="archive-new" onclick="creaNuovaListaDaGestione()">＋ Nuova lista</button></div>
+ </div>
+</div>
+
+<div id="visualizzaLista" class="archive-backdrop" role="dialog" aria-modal="true" aria-labelledby="titoloVisualizzaLista" onclick="if(event.target===this)chiudiListaVisualizzata()">
+ <div class="archive-panel archive-view-panel">
+  <div class="archive-heading"><h2 id="titoloVisualizzaLista">🛒 Lista precedente</h2><button type="button" class="archive-close" onclick="chiudiListaVisualizzata()" aria-label="Chiudi">✕</button></div>
+  <p id="sottotitoloVisualizzaLista" class="archive-help"></p>
+  <div id="prodottiListaVisualizzata" class="archive-view-list"></div>
+  <div class="archive-footer"><button type="button" class="archive-new" onclick="chiudiListaVisualizzata()">Chiudi visualizzazione</button></div>
  </div>
 </div>
 <script>
@@ -864,7 +874,7 @@ function renderArchivioListe() {
     const name=document.createElement("strong");name.textContent=l.nome;
     const detail=document.createElement("small");detail.textContent=(l.prodotti?.length||0)+" prodotti"+(l.id===idListaAttiva?" · Lista aperta":"");
     info.append(name,detail);
-    const apri=document.createElement("button");apri.type="button";apri.textContent=l.id===idListaAttiva?"Aperta":"Richiama";apri.disabled=l.id===idListaAttiva;apri.onclick=()=>richiamaLista(l.id);
+    const apri=document.createElement("button");apri.type="button";apri.className="archive-view-button";apri.textContent=l.id===idListaAttiva?"Aperta":"Visualizza";apri.disabled=l.id===idListaAttiva;apri.onclick=()=>visualizzaLista(l.id);
     const elimina=document.createElement("button");elimina.type="button";elimina.textContent="🗑";elimina.className="red";elimina.title="Elimina definitivamente";elimina.onclick=()=>eliminaListaArchivioDefinitivamente(l.id);
     r.append(info,apri,elimina);box.append(r);
   });
@@ -882,14 +892,24 @@ function eliminaListaArchivioDefinitivamente(id){
   }
   renderArchivioListe();
 }
-function richiamaLista(id) {
+function visualizzaLista(id) {
   const trovata=archivioListe.find(l=>l.id===id);if(!trovata)return;
-  archiviaListaAttiva();
-  idListaAttiva=trovata.id;nomeLista=trovata.nome;
-  listaSpesa=JSON.parse(JSON.stringify(trovata.prodotti||[]));
-  localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
-  localStorage.setItem(CHIAVE_NOME_LISTA,nomeLista);
-  salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
+  document.getElementById("titoloVisualizzaLista").textContent="🛒 " + trovata.nome;
+  document.getElementById("sottotitoloVisualizzaLista").textContent=(trovata.prodotti?.length||0)+" prodotti · Solo visualizzazione";
+  const box=document.getElementById("prodottiListaVisualizzata");
+  box.replaceChildren();
+  const prodottiLista=trovata.prodotti||[];
+  if(!prodottiLista.length){box.innerHTML='<div class="archive-view-empty">Questa lista era vuota.</div>';}
+  prodottiLista.forEach(p=>{
+    const row=document.createElement("div");row.className="archive-view-item";
+    const alimento=infoAlimento(p.nome);
+    row.innerHTML='<div class="archive-view-emoji" aria-hidden="true">'+alimento.emoji+'</div><div><strong>'+escapeHtml(p.nome)+'</strong>'+(p.acquistato?'<div class="small-note">✓ Già acquistato</div>':'')+'</div>';
+    box.append(row);
+  });
+  document.getElementById("visualizzaLista").classList.add("open");
+}
+function chiudiListaVisualizzata() {
+  document.getElementById("visualizzaLista").classList.remove("open");
 }
 function creaNuovaListaDaGestione() {
   archiviaListaAttiva();
@@ -899,7 +919,7 @@ function creaNuovaListaDaGestione() {
   salvaListaSpesa();aggiornaNomeLista();mostraListaSpesa();chiudiGestioneListe();
 }
 function eliminaListaAttualeDaGestione() {
-  if(!confirm('Chiudere questa lista, rimetterla nell’archivio e crearne una nuova? La lista e tutti i suoi prodotti resteranno salvati e potrai richiamarli quando vuoi.'))return;
+  if(!confirm('Chiudere questa lista, rimetterla nell’archivio e crearne una nuova? La lista e tutti i suoi prodotti resteranno salvati e potrai visualizzarli quando vuoi.'))return;
   archiviaListaAttiva();
   idListaAttiva=generaIdLista();nomeLista=nomeAutomaticoData();listaSpesa=[];
   localStorage.setItem(CHIAVE_ID_LISTA,idListaAttiva);
